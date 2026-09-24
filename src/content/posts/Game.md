@@ -1,0 +1,135 @@
+---
+title: "5.x 新特性使用情况的调查"
+published: 2023-11-28
+author: "Yohiro"
+category: "Unreal"
+tags: ["graphics","rendering","unrealengine"]
+---
+## Intro
+
+UE5 已经 release 很久了，为了解当时看起来很酷炫的特性在正式游戏中的应用情况，这里追踪了 Remnant2 以及 RoboCop 的渲染情况。为获得尽可能真实可信的数据，以下抓帧时的数据均在关闭了诸如 DLSS 之类的超分技术和动态分辨率，中画质 1080p 且关闭垂直同步的情况下获取。
+
+硬件环境：
+
+- i7-10700 2.90GHz
+- NVIDIA RTX 2060
+
+## Remnant2
+
+Remnant2 中对新特性的使用非常保守，仅开启了 Nanite。抓帧的位置是新游戏的出生点，具有较多的植被，部分数冠的顶点数非常多。在该场景的 BasePass 中可以看到，所有的 Draw 都来自于 Nanite。
+
+![Remnant2](/assets/images/UE5Game/Remnant2.png)
+
+---
+
+| Pass        | Number | GPU Time[^Tip] |
+|:------------|:-------|:---------------|
+| PrePass     | 357    | 3.96           |
+| BasePass    | 453    | 2.92           |
+| ShadowDepth | 485    | 15.36          |
+| Translucent | 60     | 0.12           |
+
+### Virtual Shadow Map
+
+根据 Overview 中的表格，ShadowDepth 占用了最多的 GPU 时间，而且 PrePass 耗时也超过了 BasePass，可见整个场景的瓶颈在于`顶点数过多`。
+
+在开启了 Nanite 的情况下，Remnant2 将启用 VSM 的选项放在了设置的图形菜单中，将开启与否的选择权交给了玩家。
+
+![Menu_VSM](/assets/images/UE5Game/Menu_VSM.png){: .shadow .rounded-10 }
+_该选项就是开启 VSM_
+
+根据官方文档中所说[^VSM]，Nanite几何体始终渲染到虚拟阴影贴图，是性能最高的选项，可提供最高质量。然而这个游戏中并没有默认开启 VSM。
+
+关闭 VSM 后的 Shadow Map 是多个 1024 x 1024 的并到一个大的 Shadow Map 中，此处有七个投射阴影的光源。手动开启 VSM 后，发现渲染线程时间和 GPU 时间均获得了近 2 ms 左右的提升。VSM 的 PagePool 大小为 16384 x 1024。
+
+从抓帧的数据来看，耗时较高的几个 DrawCall 都是来自于 ShadowDepth Pass 中，考虑下面的这个 DrawCall:
+
+![ShadowDepth](/assets/images/UE5Game/ShadowDepth_Hot.png){: .shadow .rounded-10 }
+_某个 PLA 的 ShadowDepth_
+
+直接使用了 LOD 0 的 Mesh 去投射阴影，除了这个 DrawCall 外还有许多零碎的小物件，这些都增加了 ShadowDepth 的负荷。针对这种情况，通常的方案是使用代理网格或是低级的 LOD 来投射阴影。如果是因为 ShadowMap 的分辨率问题导致的 Cache miss 还要考虑 ShadowMap 的压缩。
+
+Unreal 中提供了多种阴影方案，这个游戏中也使用了不止一种，这里仅考虑高顶点数造成瓶颈的问题。
+
+### Nanite
+
+开启与关闭 Nanite，Stats 信息中的 Prims 数量有着巨大的差别，这是因为开启 Nanite 后，GNumPrimitivesDrawnRHI 中没有统计 Nanite 的图元数量，如果需要观测 Nanite 的情况，需要使用 `r.Nanite.ShowStats` 来开启 Nanite 的 Stats 面板。
+
+Nanite 效果最为明显的是树冠，下面的树的 Nanite Fallback Mesh 有 256,891 个顶点，在 PrePass, BasePass 以及 ShadowDepth 均有较高的耗时。
+
+![Tree](/assets/images/UE5Game/Foliage_Hot.png){: .shadow .rounded-10 }
+_Nsight 中树的 Geometry_
+
+### Lumen
+
+根据工作室采访时所说[^Ref]，Remnant2 中并没有使用 Lumen，通过导出的设置来看，Mesh 也没有生成 SDF。取而代之的是 Unreal 5.x 中的 Fallback 方案，即使用了 SSGI 的方式模拟全局光，而且是`半分辨率`的 SSGI。
+
+严格来说，开启 GI 后，AO 的开启与否是需要讨论的。一方面是因为 GI 已经提供了具有真实感的光照和阴影，另一方面是因为当前的 GI 方案并不完善，总是存在没有捕捉到的地方，尤其是对 SSGI 而言。因此在角落、拐角、裂缝等处的 AO 依然是必要的。
+
+所以 SSGI + DFAO + SSR 可以作为一个 Lumen 的替代方案。不过，上个月的 Unreal Fest Day[^Tip1] 中，Epic 的一位老哥给给出了这样的建议：
+
+![LumenFallback](/assets/images/UE5Game/LumenFallback.png){: .shadow .rounded-10 w='767' h='390' }
+_详情见油管视频  52min47s_
+
+即关闭 GI 用 AO + SSR 作为 Fallback 方案，回归原先 4.x 的管线。
+
+---
+
+## RoboCop
+
+RoboCop 使用了 UE5 所有的新特性，是非常标准的 5.x 的游戏。抓帧的位置同样来自游戏的出生点，场景是位于小巷中，因此顶点数不像前者那么多，地面的积水部分比较能反映 Lumen 的效果。
+
+![RoboCop](/assets/images/UE5Game/RoboCop.png)
+
+### Virtual Shadow Map
+
+VSM 的 PhysicalPagePool 在引擎中默认的分辨率是 16384 x 4096，RoboCop 里使用的是 16384 x 2048，最大的 Page 限定在 512，Page 大小不够会造成 Page Pool Overflow 使阴影消失/变为块状，后台打开抓帧的 Renderdoc 时很容易可以重现这种情景。
+
+此处有 7 处投射阴影的动态光源，因此在关闭 VSM 后绘制了 7 张 512 x 512 的 Shadow Map。在关闭 VSM 后，阴影质量被设为了最低，512 的分辨率对于 Shadow Map 来说非常低，但是抓帧的这个场景比较黑看不出来差别。
+
+在显存比较吃紧的低端设备，可以关掉 VSM，回到 CSM。
+
+### Nanite
+
+除了目前尚不支持的对蒙皮网格、透明物件的渲染以及贴花以外，场景中的 Mesh 几乎都使用了 Nanite。但是不同于前者，在全局关掉 Nanite 的支持后，没有使用 Fallback Mesh 替代，应该是修改了 ProxyRenderMode。
+
+而且这个游戏也允许走软光栅的（一般是应用了 WPO 的材质） Mesh 进入 Shadow Pass。
+
+### Lumen
+
+Lumen 的耗时在我的机器上是 5.4 ms 左右，按照 Epic 老哥的说法[^Tip1]，在 60 fps 下 Lumen 的 Budget 应该限制在 4 ms, 在 30 fps 下应该限制在 8 ms。
+
+下面的反射使用了较为粗糙的追踪，应该是关掉了 TraceMeshSDFs。
+
+![Lumen_ReflectionCompare](/assets/images/UE5Game/ReflectionCompare.png){: .shadow .rounded-10 }
+
+在使用 GI 的情况下，可以考虑仅改变不同的反射方法进行性能分级。这里是两个不同的反射方法的效果对比（Lumen vs SSR）：
+
+![Comparsion of Lumen and SSR](/assets/images/UE5Game/RoboCop_Reflection.png){: .shadow .rounded-10 }
+_Comparsion of Lumen and SSR (1)_
+
+![Comparsion of Lumen and SSR](/assets/images/UE5Game/RoboCop_Reflection2.png){: .shadow .rounded-10 }
+_Comparsion of Lumen and SSR (2)_
+
+RoboCop 的 DiffuseIndirect 进行了下采样，在中高画质下均开启了 Lumen，在低画质下关掉了 GI，也关掉了反射。
+
+## 其他
+
+有些其他的发现，比如 RoboCop 中的角色皮肤使用了半分辨率的次表面散射。对于 SceneColor 的格式，Remnant2 使用了 RGBA，而 RoboCop 使用了 RGB + SeparateTranslucency。
+
+对 RoboCop 有一点体验不佳的是，在第一次启动游戏构建 PSO 时没有任何提示页面，有一段很长时间的卡顿。XGP 版本的 Lies of P 则是另一个问题，每次启动都有重编 PSO 的界面，猜测应该是个 bug。
+
+## Summary
+
+UE5 的新特性的使用是建立在硬件规格的提升之上的，目前看来在 Nanite + Lumen + VSM + TSR/DLSS/FSR/XeSS 这样一个体系下，才能取得最佳效果。
+
+![5.x features](/assets/images/UE5Game/5dotx.png)
+_图片来自 Unreal Fest Day 2 \| Livestream 2 Pt. 2[^Fest]_
+
+## References
+
+[^Tip]: GPU Time 来自 Nsight 中的数据，具体到某一 Pass 并不准确，相对大小可供参考。
+[^VSM]: [虚拟阴影贴图](https://docs.unrealengine.com/5.3/zh-CN/virtual-shadow-maps-in-unreal-engine/)
+[^Ref]: [Remnant II Is Powered by UE5, Though It Doesn’t Use Lumen Yet](https://wccftech.com/remnant-ii-is-powered-by-ue5-though-it-doesnt-use-lumen-yet/)
+[^Tip1]: [Unreal Fest Day 1 \| Livestream 2](https://www.youtube.com/watch?v=Cb63bHkWkwk&t=7701s)
+[^Fest]: [Unreal Fest Day 2 \| Livestream 2 Pt. 2](https://www.youtube.com/watch?v=8eO2xdrDms8)

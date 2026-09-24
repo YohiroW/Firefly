@@ -1,0 +1,265 @@
+---
+title: "DLSS 的使用和注意事项"
+published: 2023-12-21
+author: "Yohiro"
+category: "Unreal"
+tags: ["unreal","dlss","graphics"]
+---
+## Overview
+
+我们知道图片放大后，相比于原图片有新产生的像素点，这些像素点通常是通过各种插值产生的，因此，直接放大的图片的质量不佳，往往会显得很糊。大学时的计算机网络课程中曾经提到过奈奎斯特采样定理，说是要恢复失真的信号，采样频率应该大于二倍的最高频率。也就是说在二倍原始采样率的情况下，可以完整的恢复原始图片的质量。但事实是，在实时渲染领域，在一帧之内，由于 GPU 渲染带来的压力，通常没有更多的采样信息用于重建该帧的图像，因此，诞生了很多时域采样的算法用来重建图像。现在游戏界流行的各种 Super Resolution 大多是基于时域重建的原理来重构图像。目前游戏界流行的超分算法有 NVIDIA 的 DLSS，AMD 的 FSR 以及 Intel 的 XeSS，Unreal 里也有内建的 TSR。
+
+DLSS 的亮点在于它是基于深度学习来重建图像的，比起其它获取时域信息来提高采样率的算法，它重建图像时对像素的评估的更准确。更多细节可以几年前知乎大佬文刀秋二的[这篇文章](https://zhuanlan.zhihu.com/p/123642175)。
+
+NVIDIA 为 Unreal 提供了 DLSS 插件，支持以下特性：
+
+NVIDIA Deep Learning Supersampling Frame Generation (DLSS-FG)
+: 适用于 Geforce RTX 40 系显卡的帧生成技术。
+
+NVIDIA Deep Learning Supersampling Super Resolution (DLSS-SR)
+: 超分变率的 DLSS，即通常我们玩家社区讨论的广义 DLSS。
+
+NVIDIA Deep Learning Anti-Aliasing (DLAA)
+: 深度学习的反走样技术。
+
+NVIDIA Image Scaling (NIS)
+: 一种可用于非 NVIDIA 产品的图像放大、锐化技术。
+
+NVIDIA Ray Reconstruction (DLSS-RR)
+: 在密集光追场景中，通过在采样的光线间生成高质量像素从而增强画面质量的技术。
+
+写这篇文章的时候，参考资料来自于 2023 年 5 月 Release 的 DLSS 3.1.13 的附带文档。
+
+## Unreal 支持
+
+[这里](https://developer.nvidia.com/rtx/dlss/get-started#ue-requirements)可以下载到 NVIDIA 官方提供的 Unreal Engine 插件。这个插件分为四个部分：
+
+- DLSS，提供超分/反走样以及即将到来的光线重建
+- DLSSMoviePipelineSupport，为 MovieRenderQueue 出片提供支持
+- NIS，提供图像拉伸的支持
+- Streamline，提供 DLSS 帧生成功能以及 [NVIDIA Reflex](https://developer.nvidia.com/performance-rendering-tools/reflex)
+
+> 根据文档说明，DLSS Sharpen 已被弃用，将来会使用 NIS 单独处理锐化。如果需要兼容将来的版本，应提早规划。
+{: .prompt-info }
+
+这篇文章将重点关注 DLSS-SR 和 DLSS-FG 在引擎里的应用以及注意事项。
+
+## DLSS-SR/RR
+
+由于 DLSS 取代的是原引擎中 TAAU 的部分，因此要确保 TAAU 是启用了的，可以通过 r.TemporalAA.Upscaler 来检查。
+
+在此基础上使用以下 Console Variable 开启 DLSS-SR:
+
+1. r.NGX.Enable 1 (也可以通过命令行传参 -ngxenable 或 -ngxdisable 控制开启)
+2. r.NGX.DLSS.Enable 1
+3. r.ScreenPercentage 66.7 (可以是 50~99 的任意值)
+
+> 屏幕分辨率需设置在合理的范围内，对 DLSS-SR 通常是 50~67 这个区间，满分辨率会启用 DLAA。
+{: .prompt-info }
+
+默认情况下，编辑器内的关卡视图是不会使用 DLSS 的，如果需要的话要去 Project Settings 的 DLSS 插件设置中勾上。
+
+### Presets
+
+UE 的 DLSS 插件设置里有一个预设选项，枚举了 A~G 共七个种类，猜测是使用了不同类型的游戏去炼丹。
+
+![presets in unreal](/assets/images/DLSS/presets-unreal.png)
+_unreal DLSS 插件中的 presets_
+
+按照 DLSS Programming Guide 的说法，在默认的 DLSS 配置下可以为画面提供不错的质量，但如果想要在此基础上进一步提升，可以考虑调整 DLSS 的预设，文档中描述了以下几种预设，对应 DLSS 插件中的 A 到 G：
+
+| 预设名称 | 模式          | 说明                                         |
+|:--------|:--------------|:--------------------------------------------|
+| A       | 性能/平衡/画质  | 最早适用的预设，能够对抗不同帧间物体运动产生的拖影 |
+| B       | 性能最佳       | 同预设 A, 但是性能最佳模式                     |
+| C       | 性能/平衡/画质  | 该预设将专注于当前帧的信息，倾向于快节奏的游戏    |
+| D       | 性能/平衡/画质  | 各模式下的默认预设，倾向于图像稳定的游戏         |
+| E       | -             | 占位符，截至目前未使用                         |
+| F       | 性能最佳       | 性能最佳模式以及 DLAA 模式下的默认预设           |
+| G       | -             | 占位符，截至目前未使用                         |
+
+### DLSS-RR
+
+如果是使用光追的工程，在使用 DLSS-RR 前需要将引擎的降噪器关掉。此外，在 EnableDLSSRR 函数中也对引擎配置的 CVars 进行了检查。
+
+DLSS-RR 要检查下面的 CVars:
+
+1. r.NGX.DLSS.denoisermode 1
+2. r.Lumen.Reflections.BilateralFilter 0 (运行时更改会触发断言，最好放在引擎的配置文件里)
+3. r.Lumen.Reflections.ScreenSpaceReconstruction 0
+4. r.lumen.Reflections.Temporal 0
+5. r.Shadow.Denoiser 0
+
+可以关注 Log 中的内容，这些初始化时的检查会输出到 Log 中，详情可见 DLSSLibrary.cpp。
+
+### GPU Debug
+
+因为使用了 NGX，所以 DLSS 可能会和一些 GPU Debug 工具（如 Renderdoc）不兼容，因此官方建议使用 NSight。
+
+### DoF
+
+DLSS 在管线中的位置和原先 UE 中 TAA Upscale 的位置一样，DoF 效果与其他 SS 存在差异。为减少与原先 DoF 效果的差异，推荐将 DLSS 的等级调节为质量或最高质量。
+
+### 常见的画面瑕疵
+
+1. Motion vector
+   
+	- Motion vector 错误,可通过 Debug Overlay 进行检查
+	- Motion vector 必须为 16/32 位的浮点数，整型会丢弃亚像素信息
+	- Motion vector 没有考虑到动态物体的运动
+
+2. 抖动
+   
+	引擎、DLSS 的抖动模式不匹配造成的画面的抖动。
+
+3. TAA/TSR 的影响
+   
+	TAA/TSR 通常会影响渲染时的 Depth/Velocity 以及 Jitter 方式。所以关闭掉 TAA/TSR 可能也会影响 DLSS 的表现。这是因为为减少时域的图像信息的失真，这类算法通常会添加相应的抖动以避免产生额外的画面瑕疵，DLSS 同样需要这些信息。
+
+4. 曝光问题
+   
+	正确的曝光/预曝光，尤其是对动态的物体。
+
+5. 剩余显存过低的问题
+   
+	在剩余显存过低，渲染资源没能在 GPU 上准备完毕时，DLSS 可能会崩溃。
+
+## DLSS-FG
+
+对于 5.2 之前的版本，需要去 NVIDIA [fork 的版本](https://github.com/NvRTX/UnrealEngine/tree/dlss3/sl2-5.2-dlss-plugin)去找相应的分支合并。对于历史版本还需要打补丁，这些可以参照目录中的相应文档，这里就不再赘述。
+
+### 硬件需求
+
+- `硬件加速 GPU 计划`必须启用，详细的看参考[这个](https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/)
+- 需要在 NV 的 Ada 架构的 GPU 上运行，也就是 RTX40/RTX6000 系显卡
+- 驱动版本 536.99 或以上
+
+### 调试
+
+帧生成的插件设置里有个 Debug Overlay 选项，打开后可以看到 Streamline 的 Overlay。
+
+### UI alpha
+
+帧生成可以同时提高 UI 的渲染质量，在 UI 完成渲染后，DLSS-FG 会提取 UI 的 Alpha 通道，UE 在默认情况下并不会清除 SceneColor 的 Alpha，因为不是所有的 UMG 材质的混合模式都输入 Alpha 还写入到像素中。但如果像是 console 窗口，在 UI 元素都渲染完后再次写 Alpha，这就会导致 console 窗口的 Alpha 不被清除，在不同的帧之间持续存在，从而影响生成的帧。
+
+引擎没有内建的方法只清除 SceneColor 的 Alpha，因此 Streamline 插件在后处理完成之后添加了一个 pass 用于在 UI 完成渲染之前清除 SceneColor 的 Alpha，该 Pass 可由 `r.Streamline.ClearSceneColorAlpha` 开启。
+
+最终传递给 Streamline 的 Alpha 只要在等于 0.0 时才会判定为 UI，这个阈值也可以通过 CVar `r.Streamline.TagUIColorAlphaThreshold` 来控制。
+
+### Reflex
+
+插件提供了 NVIDIA Reflex 的实现，它与 UE 现有的 Reflex 插件不完全兼容，该插件附带未修改的UE版本。因此文档建议禁用 UE 现有的 Reflex 插件，并使用 DLSS 帧生成插件中提供的 Reflex。
+
+但是使用 UE Reflex 插件的蓝图功能的现有项目应该在添加 UE DLSS Frame Generation 插件后继续工作，因为 Reflex 插件的蓝图应该默认调用 DLSS Frame Generation 插件的模块化功能。
+
+### 编辑器
+
+帧生成目前只应用于打包版本以及编辑器中 PIE 时，因此在正常编辑时是没有帧生成效果的。
+
+### VSync
+
+文档建议在使用帧生成时关掉 VSync，启用该功能时可能会导致 VSync 的效果不正确。
+
+## 其他细节
+
+### 色彩空间
+
+DLSS 可以处理 LDR/HDR，但对 LDR 有一些需要注意的点：
+
+- LDR 的色彩空间必须被映射到 0 到 1
+- LDR 模式下，DLSS 使用低精度的 8 位色彩，输入给 DLSS 的 color buffer 需要是线性的编码，如 sRGB
+- LDR 模式下，颜色的数据不能是在线性颜色空间的，如果在 LDR 模式下处理线性空间的颜色，DLSS 会产生 color banding/shifting 等各种视觉问题
+
+### 渲染资源的创建标记
+
+- 传入 DLSS 的 input buffer，比如颜色、运动向量、深度还有历史帧、曝光等，需要时可读的资源状态，像是 SRV/Texture/SampleImage 这种，因为需要传入 ComputeShader。比如在 DX12 下，资源状态的标记应该为 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE。
+
+- 同理，输出的 output buffer 的资源需要是 UAV（RWTexture/StorageImage），DX12 下的标记需要是 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS。
+
+### Mipmap
+
+由于 DLSS 启用时，贴图是在显示分辨率而不是渲染分辨率下采样的，所以可以考虑使用 mip bias 提升整体的贴图质量，建议计算如下：
+
+``` cpp
+DlssMipLevelBias = NativeBias + log2(Render XResolution / Display XResolution) - 1.0 + epsilon
+```
+
+如果贴图本身像素是高频、比较密集的，可能不太适合这种方法，最好将该贴图的 mip bias 保持原状。
+
+### Motion Vector
+
+DLSS 的关键点之一就是速度图，对每一个像素渲染其运动向量，通过该速度图实现前一帧和后一帧的映射。因此，低精度和错误的速度图通常会造成渲染错误。
+
+DLSS 速度图的格式为 RG32_FLOAT 或 RG16_FLOAT。因此，如果引擎自定义了速度图的格式，传给 DLSS 前需要进行解码。
+
+DLSS 计算运动向量的方式与 Unreal 有所不同，文档中给出了这样的 shader 代码用于将 Unreal 计算的运动向量转为 DLSS 可用的：
+
+```c
+Texture2D DepthTexture; 
+Texture2D VelocityTexture; 
+
+float2 UVToClip(float2 UV) 
+{ 
+	return float2(UV.x * 2 - 1, 1 - UV.y * 2); 
+} 
+
+float2 ClipToUV(float2 ClipPos) 
+{ 
+	return float2(ClipPos.x * 0.5 + 0.5, 0.5 - ClipPos.y * 0.5); 
+}
+
+float3 HomogenousToEuclidean(float4 V) 
+{
+	return V.xyz / V.w; 
+}
+
+void VelocityResolvePixelShader( 
+	float2 InUV : TEXCOORD0, 
+	float4 SvPosition : SV_Position, 
+	out float4 OutColor : SV_Target0 )
+{
+	OutColor = 0;
+	float2 Velocity = VelocityTexture[SvPosition.xy].xy;
+	float Depth = DepthTexture[SvPosition.xy].x;
+
+	if (all(Velocity.xy > 0)) 
+	{ 
+		Velocity = DecodeVelocityFromTexture(Velocity);
+	}
+	else
+	{ 
+		float4 ClipPos; 
+		ClipPos.xy = SvPositionToScreenPosition(float4(SvPosition.xyz, 1)).xy; 
+		ClipPos.z = Depth; 
+		ClipPos.w = 1; 
+
+		float4 PrevClipPos = mul(ClipPos, View.ClipToPrevClip); 
+
+		if (PrevClipPos.w > 0) 
+		{ 
+			float2 PrevClip = HomogenousToEuclidean(PrevClipPos).xy;
+			Velocity = ClipPos.xy - PrevClip.xy; 
+		}
+	}
+
+	OutColor.xy = Velocity * float2(0.5, -0.5) * View.ViewSizeAndInvSize.xy;
+	OutColor.xy = -OutColor.xy; 
+}
+```
+
+### Conservative Rasterization
+
+如果画面中存在一些细小的对象，它的信息有可能会在渲染时丢失，比如使用较低分辨率渲染，或者因像素过少被光栅器丢弃。DLSS 可以重建这种丢失的细节，但前提是要有该对象的运动信息。对细小像素应用的 Conservative Rasterization[^Ref1][^Ref2]，允许即使十分细微的像素也可以光栅化到图像上，借助于此，可以构建更多细节。
+
+### 亚像素抖动
+
+为模拟高采样率，DLSS 通过应用亚像素抖动的方法来让渲染器提供的额外采样点。
+
+3D 渲染中有很多可用的抖动方式，考虑到最终效果，抖动方式需要有比较好的像素覆盖率。NV 训练时，发现使用 [Halton sequence](https://en.wikipedia.org/wiki/Halton_sequence) 可以取得最好的画面效果。Halton 序列是一种低差异序列，可以生成分布均匀的样本点。
+
+Halton 序列在 Unreal 里地形上的草地、大气雾以及光照贴图等中都有应用。
+
+## 参考
+
+[^Ref1]: [Direct3D 12 Conservative Rasterization](https://learn.microsoft.com/en-us/windows/win32/direct3d12/conservative-rasterization)
+[^Ref2]: [Chapter 42. Conservative Rasterization](https://developer.nvidia.com/gpugems/gpugems2/part-v-image-oriented-computing/chapter-42-conservative-rasterization)
