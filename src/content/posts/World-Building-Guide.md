@@ -95,6 +95,8 @@ WP 与 OFPA 密不可分，因此需要考虑产生的额外的 actor 文件数�
 
 #### 堡垒之夜 第四章
 
+| 项目 | 数值 |
+| --- | --- |
 |地图大小|`2km x 2km`|
 |Actor 数量|`约 100k`|
 |Cell 大小|`128m`|
@@ -124,6 +126,8 @@ WP 与 OFPA 密不可分，因此需要考虑产生的额外的 actor 文件数�
 
 #### 黑客帝国 demo
 
+| 项目 | 数值 |
+| --- | --- |
 |地图大小|`4km x 4km`|
 |Actor 数量|`约 107k`|
 |Cell 大小|`128m`|
@@ -147,6 +151,8 @@ WP 与 OFPA 密不可分，因此需要考虑产生的额外的 actor 文件数�
 
 #### 古代山谷 demo
 
+| 项目 | 数值 |
+| --- | --- |
 |地图大小|`2km x 2km`|
 |Actor 数量|`约 14k`|
 |Cell 大小|`64m`|
@@ -167,6 +173,8 @@ WP 与 OFPA 密不可分，因此需要考虑产生的额外的 actor 文件数�
 
     更多的可以执行 DumpConsoleCommands，将所有命令 dump 出来，wp 相关的 debug 指令太多，下面仅列出一些常用的。
 
+| 命令 | 说明 |
+| --- | --- |
 | wp.Runtime.ToggleDrawRuntimeHash2D or 3D                                              | streaming grid 可视化 | 
 | wp.Runtime.OverrideRuntimeSpatialHashLoadingRange -grid=[index] -range=[DesiredValue] | 覆写指定 grid 的加载距离 |
 | wp.runtime.hlod                                                                       | 显示 HLOD |

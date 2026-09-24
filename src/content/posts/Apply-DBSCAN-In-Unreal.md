@@ -71,6 +71,7 @@ _以该拐点为界，左侧的点为噪声点，右侧的点为 Cluster 中的�
 使用 DBSCAN 进行聚类的结果如下，其中 **MinPts = 10**, **Epsilon = 450**:
 
 | 聚类结果 | 噪声 |
+| --- | --- |
 | ![MinPts = 10, Epsilon = 450](/assets/images/DBSCAN/MinPts%3D10_Eps%3D450.png) | ![Noises](/assets/images/DBSCAN/MinPts%3D10_Eps%3D450_Noises.png) |
 
 就该结果而言，存在下面几个问题：
@@ -90,6 +91,7 @@ _以该拐点为界，左侧的点为噪声点，右侧的点为 Cluster 中的�
 放大看了一下，最终我选择了 Eps = 288，下面是 **MinPts = 6**, **Epsilon = 288** 的结果：
 
 | 聚类结果 | 噪声 |
+| --- | --- |
 | ![MinPts = 6, Epsilon = 288](/assets/images/DBSCAN/MinPts%3D6_Eps%3D288.png) | ![Noises](/assets/images/DBSCAN/MinPts%3D6_Eps%3D288_Noises.png) |
 
 最终的结果差强人意，但基本满足了我的需求。

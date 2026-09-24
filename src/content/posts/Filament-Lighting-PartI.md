@@ -31,6 +31,7 @@ tags: ["3D","rendering","graphics","lighting"]
 ## 单位
 
 | 光度学术语名 | 符号 | 单位 |
+| --- | --- | --- |
 | 光功率 (Luminous power) | $\Phi$ | 流明 Lumen($lm$) |
 | 光强 (Luminous intensity) | $I$  | 坎德拉 Candela ($cd$) or $lm/sr$ |
 | 光照度 (Illuminance) | $E$ | 勒克斯 Lux ($lx$) or $lm/m^2$ |
@@ -42,6 +43,7 @@ tags: ["3D","rendering","graphics","lighting"]
 下面是 Filament 中的灯光类型以及单位。
 
 | 灯光类型 | 单位 |
+| --- | --- |
 | 方向光 | 照度 Lux ($lx$) or $lm/m^2$ |
 | 点光源 | 光功率 Lumen ($lm$) |
 | 聚光灯 | 光功率 Lumen ($lm$) |
@@ -54,34 +56,35 @@ tags: ["3D","rendering","graphics","lighting"]
 
 艺术家可能习惯于通过功率来衡量灯光的亮度，因此我们应该允许用户使用功率单位来定义灯光的亮度。转换如下:
 
-$$\begin{equation}
+$$
 \Phi = \Phi_e \eta
-\end{equation}$$
+$$
 
 这个等式中 $\eta$ 指的是发光效能，单位是流明每瓦 ($lm/W$) ，根据[维基百科中的说法](https://zh.wikipedia.org/wiki/%E7%99%BC%E5%85%89%E6%95%88%E8%83%BD)，已知最大的发光效能为 **683** $lm/W$ ，那么用发光效率 $V$ 来表示的话，就是这样：
 
-$$\begin{equation}
+$$
 \Phi = \Phi_e 683 \times V
-\end{equation}$$
+$$
 
 使用各种类型灯的发光效率或发光效率将瓦特转换为流明
 
 | 光源类型 | 发光效能($lm/W$) | 发光效率 (%) |
+| --- | --- | --- |
 | 白炽灯 | 14-35 | 2-5% |
 | LED 灯 | 28-100 | 4-15% |
 | 荧光灯 | 60-100 | 9-15% |
 
-$$\begin{equation}\label{derivedLuminousIntensity}
+$$
 I = E \cdot d^2
-\end{equation}$$
+$$
 
 ## 直接光照
 
 上面仅对不同的光源类型定义了单位，Filament 使用物理光单位，亮度的计算是在 shader 中进行的，因此所有的光照函数都要计算亮度 $L_{out}$（也称*出射辐亮度*），该亮度值取决于光照度 $E$ 和 BSDF $f(v,l)$
 
-$$\begin{equation}\label{luminanceEquation}
+$$
 L_{out} = f(v,l)E
-\end{equation}$$
+$$
 
 ### 方向光
 
@@ -93,13 +96,14 @@ L_{out} = f(v,l)E
 
 Filament 中方向光的单位是照度($lx$)，有部分原因就是可以测量天空、阳光的具体照度值，从而简化 $L_{out}$ 的计算。
 
-$$\begin{equation}
+$$
 L_{out} = f(v,l) E_{\bot} \left< N \cdot L \right>
-\end{equation}$$
+$$
 
 其中 $E_{\bot}$ 是光源对垂直于光源的表面的照度，下面是加州 3 月的晴朗天气下测得的天空和阳光的照度值（满月为 1$lx$）：
 
 | 光源 | 上午 10 点 | 中午 12 点 | 下午 5:30 |
+| --- | --- | --- | --- |
 | $Sky_{\bot}$ + $Sun_{\bot}$ | 120,000 | 130,000 | 90,000 |
 | $Sky_{\bot}$ | 20,000 | 25,000 | 9,000 |
 | $Sun_{\bot}$ | 100,000 | 105,000 | 81,000 |
@@ -125,9 +129,9 @@ vec3 luminance = BSDF(v, l) * illuminance;
 
 对于 1，可以引入区域光解决这一问题。对于 2 直接引入材质表面着色点到光源的距离 $d$ 来解决，如下。
 
-$$\begin{equation}
+$$
 E = L_{in} \left< N \cdot L \right> = \frac{I}{d^2} \left< N \cdot L \right>
-\end{equation}$$
+$$
 
 #### 点光源
 
@@ -137,62 +141,68 @@ E = L_{in} \left< N \cdot L \right> = \frac{I}{d^2} \left< N \cdot L \right>
 
 点光源的单位是发光功率（$lm$），发光功率是通过光源立体角上的发光强度的积分计算的：
 
-$$\begin{equation}
+$$
+\begin{aligned}
 \Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\pi} I d\theta d\phi = 4 \pi I \\
 I = \frac{\Phi}{4 \pi}
-\end{equation}$$
+\end{aligned}
+$$
 
 得到了发光功率，就可以很容易地计算出光照强度：
 
-$$\begin{equation}
+$$
 I = \frac{\Phi}{4 \pi}
-\end{equation}$$
+$$
 
 结合上面提到的 $L_{out}=f(v,l)E$，最终可以得到：
 
-$$\begin{equation}
+$$
 L_{out} = f(v,l) \frac{\Phi}{4 \pi d^2} \left< N \cdot L \right>
-\end{equation}$$
+$$
 
 #### 聚光灯
 
-聚光灯由位置、方向和两个锥角 $$\theta_{inner}$$ 和 $$\theta_{outer}$$ 来定义。一般的光照使用 $$\frac{1}{d^2}$$ 来定义距离的衰减，而对于聚光灯 $$\theta_{inner}$$ 和 $$\theta_{outer}$$ 定义了聚光灯锥形区域两侧的角度衰减。
+聚光灯由位置、方向和两个锥角 $\theta_{inner}$ 和 $\theta_{outer}$ 来定义。一般的光照使用 $\frac{1}{d^2}$ 来定义距离的衰减，而对于聚光灯 $\theta_{inner}$ 和 $\theta_{outer}$ 定义了聚光灯锥形区域两侧的角度衰减。
 
 ![](/assets/images/Filament/diagram_spot_light.png)
 
-$$\begin{equation}\label{spotLightLuminousPower}
-\Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\theta_{outer}} I d\theta d\phi = 2 \pi (1 - cos\frac{\theta_{outer}}{2})I\\\\
+$$
+\begin{aligned}
+\Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\theta_{outer}} I d\theta d\phi = 2 \pi (1 - cos\frac{\theta_{outer}}{2})I\\
 I = \frac{\Phi}{2 \pi (1 - cos\frac{\theta_{outer}}{2})}
-\end{equation}$$
+\end{aligned}
+$$
 
 但在这里，聚光灯的圆锥与亮度耦合在一起，调整锥角的角度时，也会同时影响亮度。因此，需要将角度和亮度解耦以便灯光师调节：
 
-$$\begin{equation}\label{spotLightLuminousPowerB}
-\Phi = \pi I \\\\
-I = \frac{\Phi}{\pi} \\\\
-\end{equation}$$
+$$
+\begin{aligned}
+\Phi = \pi I \\
+I = \frac{\Phi}{\pi} \\
+\end{aligned}
+$$
 
 聚光灯的两种评估方式：
 
 从吸收光的角度
 :
 
-$$\begin{equation}\label{spotAbsorber}
+$$
 L_{out} = f(v,l) \frac{\Phi}{\pi d^2} \left< N \cdot L \right> \lambda(l)
-\end{equation}$$
+$$
 
 从反射光的角度
 :
 
-$$\begin{equation}\label{spotReflector}
+$$
 L_{out} = f(v,l) \frac{\Phi}{2 \pi (1 - cos\frac{\theta_{outer}}{2}) d^2} \left< N \cdot L \right> \lambda(l)
-\end{equation}$$
+$$
 
-以上两式中的 $$\lambda(l)$$ 项是聚光灯的角度衰减因子，描述如下：
+以上两式中的 $\lambda(l)$ 项是聚光灯的角度衰减因子，描述如下：
 
-$$\begin{equation}\label{spotAngleAtt}
+$$
 \lambda(l) = \frac{l \times spotDirection - cos\theta_{outer}}{cos\theta_{inner} - cos\theta_{outer}}
-\end{equation}$$
+$$
 
 #### 衰减函数
 
@@ -203,9 +213,9 @@ $$\begin{equation}\label{spotAngleAtt}
 
 为解决上述问题 1，Filament 的解决方式是将点光源假设为一个小半径为 1 cm 的球形区域光。
 
-$$\begin{equation}\label{finitePunctualLight}
+$$
 E = \frac{I}{max(d^2, {0.01}^2)}
-\end{equation}$$
+$$
 
 为解决问题 2， 可以为每个光源引入一个影响半径的参数解决。通过引入这一变量可以展示给美术光源所影响到的范围，也能方便引擎渲染时剔除光源。
 

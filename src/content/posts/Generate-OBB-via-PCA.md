@@ -57,9 +57,9 @@ PCA 中的主成分实际上指的是，使数据中的点的投影数量最多�
 
 对期望为 $E(X)$ 和 $E(Y)$ 的随机变量 $X$ 和 $Y$ 的协方差 $Cov(X,Y)$ 定义如下：
 
-$$\begin{equation}
+$$
 Cov(X,Y) = E[(X-E(X))(Y-E(Y))] = E(XY) - E(X)E(Y)
-\end{equation}$$
+$$
 
 从上式可知，$Cov(X,Y) = Cov(Y,X)$。
 
@@ -70,11 +70,13 @@ Cov(X,Y) = E[(X-E(X))(Y-E(Y))] = E(XY) - E(X)E(Y)
 
 假设我们的数据是三维的，通过计算各维度数据的协方差后，可以得到这样的一个*实对称矩阵*，也就是**协方差矩阵**：
 
-$$\begin{bmatrix}
+$$
+\begin{bmatrix}
 Cov(X,X) & Cov(X,Y) & Cov(X,Z) \\
 Cov(Y,X) & Cov(Y,Y) & Cov(Y,Z) \\
 Cov(Z,X) & Cov(Z,Y) & Cov(Z,Z) \\
-\end{bmatrix}$$
+\end{bmatrix}
+$$
 
 主对角线的元素是变量与其自身的协方差，代表该变量的方差，非对角线上的元素代表协方差。
 

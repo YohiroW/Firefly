@@ -69,7 +69,9 @@ _BRDF 模型中的$f_d$和$f_r$_
 
 完整的表达为：
 
-$$f(v,l)=f_d(v,l)+f_r(v,l)$$
+$$
+f(v,l)=f_d(v,l)+f_r(v,l)
+$$
 
 上述方程描述的是单一入射光，完整的渲染方程中将会对整个半球面上的入射光线 $l$ 进行积分。
 
@@ -89,10 +91,10 @@ _光照对不同粗糙度的影响，从左到右表面逐渐光滑_
 
 下面的方程描述了微表面模型：
 
-$$\begin{equation}
+$$
 f_x(v,l) = \frac{1}{|n \cdot v| |n \cdot l|}
 \int_\Omega D(m,\alpha) G(v,l,m) f_m(v,l,m) (v \cdot m) (l \cdot m) dm
-\end{equation}$$
+$$
 
 其中 D 项描述微表面的法线分布，G 项对微表面的几何性质（主要是阴影和遮蔽）进行描述。主要的不同来自于对半球微表面的积分$f_m$：
 ![](/assets/images/Filament/diagram_micro_vs_macro.png)
@@ -117,9 +119,9 @@ _电介质和导体表面的 BRDF 模型_
 
 在 Cook-Torrance 的微表面模型中，Specular BRDF 可描述为，
 
-$$\begin{equation}
+$$
 f_r(v,l) = \frac{D(h, \alpha) G(v, l, \alpha) F(v, h, f0)}{4 (n \cdot v)(n \cdot l)}
-\end{equation}$$
+$$
 
 在实时渲染领域常采用对 D、G、F 项的近似，[**这里**](http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html) 提供了更多关于 Specular BRDF 的参考。
 
@@ -127,9 +129,9 @@ f_r(v,l) = \frac{D(h, \alpha) G(v, l, \alpha) F(v, h, f0)}{4 (n \cdot v)(n \cdot
 
 正态分布函数（NDF）是描述现实世界物体表面分布的一种方式，但在实时渲染领域常用的是 Walter 描述的 GGX 分布，GGX 具有长衰减和短峰值的特点，GGX 的分布函数如下：
 
-$$\begin{equation}
+$$
 D_{GGX}(h,\alpha) = \frac{\alpha^2}{\pi ( (n \cdot h)^2 (\alpha^2 - 1) + 1)^2}
-\end{equation}$$
+$$
 
 下面是来自 UnrealEngine 中的实现，其中 a2 是$\alpha^2$
 
@@ -150,15 +152,15 @@ float D_GGX( float a2, float NoH )
 
 为避免精度造成的问题，可以用叉积的展开式代换，
 
-$$\begin{equation}
+$$
 | a \times b |^2 = |a|^2 |b|^2 - (a \cdot b)^2
-\end{equation}$$
+$$
 
 由于 $n$ 和 $l$ 是单位向量，便有
 
-$$\begin{equation}
+$$
 |n \times h|^2 = 1 - (n \cdot h)^2
-\end{equation}$$
+$$
 
 这样一来，我们便可以直接使用叉积来直接计算 $1-(n \cdot h)^2$
 
@@ -181,67 +183,67 @@ float D_GGX(float roughness, float NoH, const vec3 n, const vec3 h) {
 
 根据 *Heitz 2014, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs"*[^Heitz14]，Filament 使用的 Smith 几何阴影公式如下：
 
-$$\begin{equation}
+$$
 G(v,l,\alpha) = G_1(l,\alpha) G_1(v,\alpha)
-\end{equation}$$
+$$
 
 其中 $G_1$ 可使用多种模型，实时渲染中常使用 GGX 公式，
 
-$$\begin{equation}
+$$
 G_1(v,\alpha) = G_{GGX}(v,\alpha) = \frac{2 (n \cdot v)}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
-\end{equation}$$
+$$
 
 完整版即为，
 
-$$\begin{equation}
+$$
 G(v,l,\alpha) = \frac{2 (n \cdot l)}{n \cdot l + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot l)^2}} \frac{2 (n \cdot v)}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
-\end{equation}$$
+$$
 
 注意到 $G(v,l,\alpha)$ 的分子为 $4(n \cdot l) (n \cdot v)$ 这里再贴一次我们所使用的 specular BRDF，
 
-$$\begin{equation}
+$$
 f_r(v,l) = \frac{D(h, \alpha) G(v, l, \alpha) F(v, h, f0)}{4 (n \cdot v)(n \cdot l)}
-\end{equation}$$
+$$
 
 通过引入可见性函数 Visibility 项 $V(v,l,\alpha)$，将 $f_r$ 变为：
 
-$$\begin{equation}
+$$
 f_r(v,l) = D(h, \alpha) V(v, l, \alpha) F(v, h, f_0)
-\end{equation}$$
+$$
 
 其中
 
-$$\begin{equation}
+$$
 V(v,l,\alpha) = \frac{G(v, l, \alpha)}{4 (n \cdot v) (n \cdot l)} = V_1(l,\alpha) V_1(v,\alpha)
-\end{equation}$$
+$$
 
 便可消去分子，得到
 
-$$\begin{equation}
+$$
 V_1(v,\alpha) = \frac{1}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
-\end{equation}$$
+$$
 
 论文指出，通过引入微表面的高度来建模可以得到更好的结果。引入了高度$h$的 Smith 函数：
 
-$$\begin{equation}
+$$
 G(v,l,h,\alpha) = \frac{\chi^+(v \cdot h) \chi^+(l \cdot h)}{1 + \Lambda(v) + \Lambda(l)}
-\end{equation}$$
+$$
 
-$$\begin{equation}
+$$
 \Lambda(m) = \frac{-1 + \sqrt{1 + \alpha^2 tan^2(\theta_m)}}{2} = \frac{-1 + \sqrt{1 + \alpha^2 \frac{(1 - cos^2(\theta_m))}{cos^2(\theta_m)}}}{2}
-\end{equation}$$
+$$
 
 其中$\theta_m$是镜面法线$n$与观察方向$v$的夹角，因此有$cos(\theta_m) = n \cdot v$，代换后得到
 
-$$\begin{equation}
+$$
 \Lambda(v) = \frac{1}{2} \left( \frac{\sqrt{\alpha^2 + (1 - \alpha^2)(n \cdot v)^2}}{n \cdot v} - 1 \right)
-\end{equation}$$
+$$
 
 由此得出可见性函数，
 
-$$\begin{equation}
+$$
 V(v,l,\alpha) = \frac{0.5}{n \cdot l \sqrt{(n \cdot v)^2 (1 - \alpha^2) + \alpha^2} + n \cdot v \sqrt{(n \cdot l)^2 (1 - \alpha^2) + \alpha^2}}
-\end{equation}$$
+$$
 
 Unreal 中的实现如下：
 
@@ -257,9 +259,9 @@ float Vis_SmithJoint(float a2, float NoV, float NoL)
 
 考虑到根号下都是平方项，且每项∈[0,1]，于是可优化为：
 
-$$\begin{equation}
+$$
 V(v,l,\alpha) = \frac{0.5}{n \cdot l (n \cdot v (1 - \alpha) + \alpha) + n \cdot v (n \cdot l (1 - \alpha) + \alpha)}
-\end{equation}$$
+$$
 
 虽然在数学上是错的，但对于移动设备的实时渲染是足够的。Filament 中的实现如下：
 
@@ -274,9 +276,9 @@ float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness) {
 
 [Hammon17] 提出了相似的优化思路，通过插值来实现：
 
-$$\begin{equation}
+$$
 V(v,l,\alpha) = \frac{0.5}{lerp(2 (n \cdot l) (n \cdot v), (n \cdot l) + (n \cdot v), \alpha)}
-\end{equation}$$
+$$
 
 #### F 菲涅尔（Fresnel）
 
@@ -284,9 +286,9 @@ V(v,l,\alpha) = \frac{0.5}{lerp(2 (n \cdot l) (n \cdot v), (n \cdot l) + (n \cdo
 
 反射光的强度不仅取决于视角，还取决于材质的折射率 IOR。将入射光线垂直于表面时（Normal）反射率记为$f_0$，掠射角（Grazing）反射率记为$f_{90}$。根据 [Schlick94] 描述，在 Cook-Torrance 的微表面模型中，Specular BRDF 的菲涅尔项的一种近似可写为：
 
-$$\begin{equation}
+$$
 F_{Schlick}(v,h,f_0,f_{90}) = f_0 + (f_{90} - f_0)(1 - v \cdot h)^5
-\end{equation}$$
+$$
 
 Unreal 的实现如下：
 
@@ -304,16 +306,16 @@ float3 F_Schlick(float3 F0, float3 F90, float VoH)
 
 漫反射中常用 Lambertian 函数，漫反射的 BRDF：
 
-$$\begin{equation}
+$$
 f_d(v,l) = \frac{\sigma}{\pi} \frac{1}{| n \cdot v | | n \cdot l |}
 \int_\Omega D(m,\alpha) G(v,l,m) (v \cdot m) (l \cdot m) dm
-\end{equation}$$
+$$
 
 Filament 中的实现，假定微表面半球面产生均一的漫反射，因此一个简单的 Lambertian BRDF 为
 
-$$\begin{equation}
+$$
 f_d(v,l) = \frac{\sigma}{\pi}
-\end{equation}$$
+$$
 
 实现也非常简单，
 
@@ -327,15 +329,15 @@ vec3 Fd = diffuseColor * Fd_Lambert();
 
 迪士尼的 BRDF 和 Oren-Nayar 模型都考虑到了粗糙度的影响，并会在掠射角出产生细微的逆反射。迪士尼的 Diffuse BRDF 如下：
 
-$$\begin{equation}
+$$
 f_d(v,l) = \frac{\sigma}{\pi} F_{Schlick}(n,l,1, f_{90}) F_{Schlick}(n,v,1,f_{90})
-\end{equation}$$
+$$
 
 其中
 
-$$\begin{equation}
+$$
 f_{90}=0.5 + 2 \cdot \alpha cos^2(\theta_d)
-\end{equation}$$
+$$
 
 Unreal 中对这两种模型的 Diffuse BRDF 的实现：
 
@@ -490,9 +492,9 @@ vec3 diffuseColor = (1.0 - metallic) * baseColor.rgb;
 
 在 Filament 中，使用者所指定的粗糙度叫做`perceptualRoughness` 感知粗糙度，是一种直观的、经验性的值，这种粗糙度会使用下面公式映射到线性空间，
 
-$$\begin{equation}
+$$
 \alpha = perceptualRoughness^2
-\end{equation}$$
+$$
 
 ![](/assets/images/Filament/material_roughness_remap.png)
 _感知线性粗糙度 (PerceptualRoughness，上）和重映射的粗糙度（$\alpha$，下）_
@@ -501,8 +503,7 @@ _感知线性粗糙度 (PerceptualRoughness，上）和重映射的粗糙度（$
 
 经过平方，重映射的粗糙度给出的结果在视觉上很直观，对于实时渲染来说也很友好。但是也要注意，由于计算中经常需要 Roughness 项，因此计算时浮点数的精度问题需要予以重视。比如 *mediump* 精度的 *float* 在移动 GPU 上一般会作为半精度也就是 *FP16* 来实现。
 
-这样就会造成问题，比如计算 GGX 项中的 $\frac{1}{perceptualRoughness^4}$ 时，由于半精度浮点数可表示的最小值为 $2^{-14
-}$ 或 $6.1 × 10^{-5}$，在不支持非规格化的设备上为了避免除以 0，这一项的结果必须不小于 $6.1 × 10^{-5}$， 为此 Roughness 必须被 clamp 到 0.089，也就是 $6.274 × 10^{-5}$。
+这样就会造成问题，比如计算 GGX 项中的 $\frac{1}{perceptualRoughness^4}$ 时，由于半精度浮点数可表示的最小值为 $2^{-14}$ 或 $6.1 × 10^{-5}$，在不支持非规格化的设备上为了避免除以 0，这一项的结果必须不小于 $6.1 × 10^{-5}$， 为此 Roughness 必须被 clamp 到 0.089，也就是 $6.274 × 10^{-5}$。
 
 很多时候为了控制镜面高光处于一个更小的范围，Roughness 也需要 clamp 到一个安全的范围，对于较低的 Roughness 值，这种 clamp 还可以避免高光出现的锯齿。
 
@@ -513,9 +514,9 @@ _感知线性粗糙度 (PerceptualRoughness，上）和重映射的粗糙度（$
 电介质
 : 菲涅尔项依赖于法向的镜面反射率 $f_0$ ，对于电介质材质是消色差的，可以用灰度来描述。Filament 中使用 [**Moving Frostbite to PBR**](https://media.contentapi.ea.com/content/dam/eacom/frostbite/files/s2014-pbs-frostbite-slides.pdf) 中所提到的电介质表面对反射率进行重映射：
 
-$$\begin{equation}
+$$
 f_0 = 0.16 * {reflectance}^2
-\end{equation}$$
+$$
 
 这种做法的目标是将 $f_0$ 映射到常见的电介质表面（约 4%）以及宝石（8% ~ 16%）的菲涅尔值的范围内。
 ![Diagram_Reflectance](/assets/images/Filament/diagram_reflectance.png)
@@ -523,15 +524,15 @@ _常见材质的反射率_
 
 假如折射率（IOR）已知，$f_0$ 可以做如下计算：
 
-$$\begin{equation}
-f_0 = \frac{(n_{ior} - 1)^2}{(n_{ior} + 1)^2}  
-\end{equation}$$
+$$
+f_0 = \frac{(n_{ior} - 1)^2}{(n_{ior} + 1)^2}
+$$
 
 而假如反射率已知，也可以反求出其折射率：
 
-$$\begin{equation}
+$$
 n_{ior} = \frac{2}{1 - \sqrt{f_0}} - 1
-\end{equation}$$
+$$
 
 下表中描述了自然界常见材质的菲涅尔反射率：
 
@@ -554,9 +555,9 @@ n_{ior} = \frac{2}{1 - \sqrt{f_0}} - 1
 导体
 : 金属表面的镜面反射率不是消色的，是彩色的：
 
-$$\begin{equation}
+$$
 f_0 = {baseColor}* {metallic}
-\end{equation}$$
+$$
 
 对于电介质和金属材质而言，Filament 使用下面的方法计算 $f_0$:
 

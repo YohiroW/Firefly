@@ -44,6 +44,8 @@ _三种力对应三种不同的形变_
 
 参考图 1，将各质点编码，对第 [i,j] 个质点，与他相连的其他的弹簧的位置为：
 
+| 约束类型 | 相邻质点 |
+| --- | --- |
 | 结构约束 | [i, j+1]，[i, j-1]，[i+1, j]，[i-1, j] |
 | 剪切约束 | [i+1, j+1]，[i+1, j-1]，[i-1, j-1]，[i-1, j+1] |
 | 弯曲约束 | [i, j+2]，[i, j-2]，[i+2, j]，[i-2, j] |
@@ -56,9 +58,9 @@ _三种力对应三种不同的形变_
 
 而原始长度 Rest length 用于求解约束，计算某时刻两质点间的相对距离与原始长度 Rest length 的差值，从而确定约束力的大小，其距离约束可以这么表达：
 
-$$\begin{equation}
+$$
 C_{dist}(p_0, p_1) = |p_0-p_1| - d_{rest}
-\end{equation}$$
+$$
 
 上述计算弹力并求解约束的过程大致可由代码表达如下：
 
@@ -87,9 +89,9 @@ $F_s$ 满足[胡克定律](https://zh.wikipedia.org/wiki/%E8%83%A1%E5%85%8B%E5%A
 
 阻尼（Damping）
 : 如果没有阻尼的限制，弹簧振子的将会无止境地弹下去，因此引入阻尼来模拟弹簧弹性渐弱，能量流失的过程。对材质阻尼系数为 $c_d$ 速度为 $v$ 的质点，阻尼力 $F_d$ 记为:
-$$\begin{equation}
+$$
 F_d = -c_d\,v
-\end{equation}$$
+$$
 
 重力
 : 重力通常作为一个全局常量而存在，不过也不排除部分游戏中有以重力为核心的玩法，在这里我们将重力记为 $F_g$。
@@ -103,15 +105,15 @@ F_d = -c_d\,v
 
 对于合力 $F$，有
 
-$$\begin{equation}
+$$
 F = F_s + F_d + F_g + F_e
-\end{equation}$$
+$$
 
 知道了质点的质量 $m$，根据牛二，可以获得加速度 $a$
 
-$$\begin{equation}
+$$
 a = \frac{F}{m} = \frac{F_s + F_d + F_g + F_e}{m}
-\end{equation}$$
+$$
 
 有了加速度便可以根据 $t$ 时刻的速度和位置计算出 $t+1$ 时刻的速度和位置：
 
@@ -137,7 +139,7 @@ $$
 
 | 对马岛中的碰撞凸包示意 | 运行时 |
 |:-----------------------|:------|
-| ![PhysicalAsset](/assets/images/Cloth/proxy.png){: .w-70} | ![PhysicalAssetInGame](/assets/images/Cloth/TsushimaInGame.png){: .w-70} |
+| ![PhysicalAsset](/assets/images/Cloth/proxy.png) | ![PhysicalAssetInGame](/assets/images/Cloth/TsushimaInGame.png) |
 
 在对布料进行建模时，在每个质点上会设定一个质点的半径来限制可运动的最大距离。通过参考质点半径以及碰撞的凸包的半径来确定如何校正质点的位置。这个校正过程可以简单的抽象为：检测碰撞→碰撞发生→根据穿深进行反方向校正，大多数布料发生碰撞的过程都遵循这个过程，从而避免穿模。
 

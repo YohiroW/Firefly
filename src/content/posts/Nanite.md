@@ -213,6 +213,7 @@ _Nanite 的双 Pass 剔除_
 Nanite 的软光栅通过 64 位的原子操作 [InterlockedMax](https://learn.microsoft.com/zh-cn/windows/win32/direct3dhlsl/interlockedmax) 完成，从高位到低位分别是：
 
 | Depth | 可见 cluster 的索引 | 三角形索引 |
+| --- | --- | --- |
 | 30    | 24                 | 7        |
 
 软光栅运行在一个 thread group 为 128 的 compute shader 上，分两个阶段：
@@ -367,6 +368,8 @@ Nanite 的软光栅的单位是也是 quad，但相比传统的三角形光栅�
 
 Main pass:
 
+| 指标 | 数量 |
+| --- | --- |
 | Instances pre-cull | 896322 |
 | Instances post-cull | 3668 |
 | Cluster node visits | 39274 |
@@ -376,6 +379,8 @@ Main pass:
 
 Post pass:
 
+| 指标 | 数量 |
+| --- | --- |
 | Instances pre-cull | 102804 |
 | Instances post-cull | 365 |
 | Cluster node visits | 19139 |
@@ -385,6 +390,8 @@ Post pass:
 
 Total rasterized:
 
+| 指标 | 数量 |
+| --- | --- |
 | Clusters | 199,420 |
 | Triangles | 25,041,711 |
 | Vertices | 19,851,262 |
@@ -552,6 +559,7 @@ Nanite 倾向于选择较小的字节值，这么做是为了更好的 LZ 编码
 最终的编码结构是一系列 bit mask 和偏移值，它们用于指示何时重置条带、何时向左或向右移动以及是否需要应用偏移。
 
 | IsReset | IsLeft | IsRef | Ref Value |
+| --- | --- | --- | --- |
 | 1       | 0      | 0     | -         |
 | 0       | 0      | 1     | 6         |
 | 0       | 1      | 0     | -         |

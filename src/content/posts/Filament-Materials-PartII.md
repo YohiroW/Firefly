@@ -30,9 +30,9 @@ Clear coat 也会使用标准模型中同样的 Cook-Torrance 微表面 BRDF 进
 
 由于标准模型中使用的分布函数项以及菲涅尔项的计算已经足够简单[^Disney][^Karis13a]，所以这里仅考虑 Geomertry 项，在[这篇论文](https://www.researchgate.net/publication/2378872_A_Microfacet_Based_Coupled_Specular-Matte_BRDF_Model_with_Importance_Sampling)[^Kelemen01]中描述了一种基于重要性采样的可以取代 SmithGGX 的几何阴影函数。
 
-$$\begin{equation}
+$$
 V(l,h) = \frac{1}{4({l}\cdot{h})^2}
-\end{equation}$$
+$$
 
 这个函数所描绘的 Mask Shadow 并不是基于物理的，但它足够简单，适合实时渲染。GLSL 中的实现也非常简单：
 
@@ -46,15 +46,15 @@ float V_Kelemen(float LoH) {
 
 Specular BRDF 需要法向的反射率 $f_0$，这里假定涂层的主要成分是聚氨酯，一种涂料和清漆中常见的化合物，在*空气-聚氨酯*的 IOR 为 1.5，因此可以参考上面提到的公式计算 $f_0$：
 
-$$\begin{equation}
+$$
 f_0 = \frac{(1.5 - 1)^2}{(1.5 + 1)^2} = 0.04
-\end{equation}$$
+$$
 
 由于透明涂层的存在，必须考虑能量的损耗，
 
-$$\begin{equation}
+$$
 f(v,l) = f_d(v,l)(1- F_c)+f_r(v,l)(1-F_c)+f_c(v,l)
-\end{equation}$$
+$$
 
 这里，$F_c$ 是 clear coat 的 Fresnel 项，$f_c$ 是 clear coat BRDF。
 
@@ -103,21 +103,21 @@ void BRDF(...)
 
 首先计算标准材质层的 IOR:
 
-$$\begin{equation}
+$$
 IOR_{base} = \frac{1+\sqrt{f_0}}{1-\sqrt{f_0}}
-\end{equation}$$
+$$
 
 然后计算标准材质层的 $f_{0base}$，其中 1.5 是涂层的折射率，
 
-$$\begin{equation}
+$$
 f_{0base} = (\frac{IOR_{base}-1.5}{IOR_{base}+1.5})^2
-\end{equation}$$
+$$
 
 涂层层的折射率是固定的，可以将上述的两个方程联立以简化：
 
-$$\begin{equation}
+$$
 f_{0base} = \frac{(1-5\sqrt{f_0})^2}{(5-\sqrt{f_0})^2}
-\end{equation}$$
+$$
 
 如果需要进一步的优化 clear coat 模型，可以将标准材质层的粗糙度从 ClearCoatRoughness 中分离出来。
 
@@ -132,35 +132,35 @@ _各向同性 vs 各向异性_
 
 可以通过将描述各向同性的标准材质模型的 specular BRDF 的粗糙度分解为**切线方向的粗糙度 $\alpha_{t}$** 和**副切线方向的粗糙度 $\alpha_{b}$**，从而获得各向异性材质的 NDF
 
-$$\begin{equation}
+$$
 D_{aniso}(h,\alpha) = \frac{1}{\pi\alpha_{t}\alpha_{b}} \frac{1}{(( \frac{t \cdot h}{\alpha_{t}})^2 + ( \frac{b \cdot h}{\alpha_{b}})^2 +(n \cdot h)^2)^2}
-\end{equation}$$
+$$
 
 但是这个 NDF 会引入两个额外参数。[**Neubelt13**](https://blog.selfshadow.com/publications/s2013-shading-course/rad/s2013_pbs_rad_slides.pdf)[^Neubelt13] 提出引入 anisotropy 参数，用该参数来表示 $\alpha_{t}$ 和 $\alpha_{b}$，
 
 $$
-\begin{align*}
+\begin{aligned}
   \alpha_t &= \alpha \\
   \alpha_b &= lerp(0, \alpha, 1 - anisotropy)
-\end{align*}
+\end{aligned}
 $$
 
 [**迪士尼的模型**](https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf)[^Disney]中定义的各向异性有较好的视觉效果，但也更为昂贵：
 
 $$
-\begin{align*}
+\begin{aligned}
   \alpha_t &= \frac{\alpha}{\sqrt{1 - 0.9 \times anisotropy}} \\
   \alpha_b &= \alpha \sqrt{1 - 0.9 \times anisotropy}
-\end{align*}
+\end{aligned}
 $$
 
 Filament 没有使用上面二者，而是选择了高光更为锐利的 [**Kulla17**](https://blog.selfshadow.com/publications/s2017-shading-course/imageworks/s2017_pbs_imageworks_slides_v2.pdf)[^Kulla17]:
 
 $$
-\begin{align*}
+\begin{aligned}
   \alpha_t &= \alpha \times (1 + anisotropy) \\
   \alpha_b &= \alpha \times (1 - anisotropy)
-\end{align*}
+\end{aligned}
 $$
 
 由于法线贴图本身就需要切线和副切线数据，因此这两个参数可以很方便的获得到，下面是最终的实现：
@@ -203,21 +203,21 @@ _传统微表面 BRDF 模型下的布料（左）与 Filament 中的布料（右
 
 Filament 使用的布料 BRDF 是经过修改的微表面 BRDF。而在 BRDF 的各项中，分布函数项（NDF）对 BRDF 的贡献最大[^Ashikhmin07]。该分布项是逆高斯分布，有助于实现前向/后向散射的模糊照明，并在此基础上添加模拟镜面反射的偏移。描述天鹅绒材质的 NDF 描述如下：
 
-$$\begin{equation}
+$$
 D_{velvet}(v,h,\alpha) = c_{norm}(1 + 4 exp\left(\frac{-{cot}^2\theta_{h}}{\alpha ^2}\right))
-\end{equation}$$
+$$
 
 该 NDF 是 [Ashikhmin00](https://www.semanticscholar.org/paper/Distribution-based-BRDFs-Ashikhmin-Premoze/c54e98f379334f881389962c8598148389db5c40)[^Ashikhmin00] 中的变体，该 NDF 也有标准化的版本[^Neubelt13]：
 
-$$\begin{equation}
+$$
 D_{velvet}(v,h,\alpha) = \frac{1}{\pi(1 + 4\alpha^2)}(1 + 4 \frac{exp\left(\frac{-{cot}^2\theta_{h}}{\alpha^2}\right)}{\sin^4{\theta_{h}}})
-\end{equation}$$
+$$
 
 标准化的等式中，分母可以进一步平滑为：
 
-$$\begin{equation}
+$$
 f_{r}(v,h,\alpha) = \frac{D_{velvet}(v,h,\alpha)}{4(n \cdot l + n \cdot l - (n \cdot l)(n \cdot v))}
-\end{equation}$$
+$$
 
 GLSL 的实现如下，适配了半浮点数并避免了余切的计算，用三角函数恒等式替换，且在该 BRDF 中删去了 Fresnel 项：
 
@@ -236,9 +236,9 @@ float D_Ashikhmin(float roughness, float NoH)
 
 此外还有一种 NDF 的实现[^Estevez17]，不同于前者使用了逆高斯分布的 NDF，该分布以正弦函数的指数为基础，它的参数表达更为自然直观，效果更加柔和，被称为*Charlie Sheen*。
 
-$$\begin{equation}
+$$
 D(m) = \frac{(2+\frac{1}{\alpha})\sin(\theta)^\frac{1}{\alpha}}{2\pi}
-\end{equation}$$
+$$
 
 Filament 中的优化实现如下：
 
@@ -266,17 +266,17 @@ Filament 中的布料材质模型的漫反射项依然依赖于 Lambertian Diffu
 
 没有散射项的 Diffuse BRDF 项如下：
 
-$$\begin{equation}
+$$
 f_{d}(v,h) = \frac{c_{diff}}{\pi}(1 - F(v,h))
-\end{equation}$$
+$$
 
 这里的 $F(v,h)$ 是布料的 Specular BRDF 的 Fresnel 项，在实践中可以选择忽略 $1 - F(v,h)$ 这一项，Filament 文档中认为不值得为该项徒增成本。
 
 次表面散射的效果以 Wrapped lighting[^GPUGemsSSS] 的方式实现，这种方法会修改漫反射函数以使表面法线和光照方向垂直的点不全为黑，以此来提高漫反射的对比度，从而模拟光线的散射行为。Filament 中以能量守恒的形式实现：
 
-$$\begin{equation}
+$$
 f_{d}(v,h) = \frac{c_{diff}}{\pi}(1 - F(v,h)) \left< \frac{n \cdot l + w}{(1 + w)^2} \right> \left< c_{subsurface} + n \cdot l \right>
-\end{equation}$$
+$$
 
 这里的 $w$ 即是描述漫反射光包裹几何体程度的值，介于 0 到 1 之间。为避免引入额外参数，Filament 将其固定为 $w$ = 0.5。Filament 里还提到一点，**漫反射项不能乘以 $n \cdot l$**，我的猜测是因为 Wrapped lighting 模拟了表面的漫反射后，光线的强度**不再**与表面法线和光照方向的夹角直接关联，因此不能直接乘。
 
@@ -316,6 +316,7 @@ color *= (lightIntensity * lightAttenuation * NoL) * lightColor;
 布料模型不具有 *Metallic* 和 *Reflectance* 两个参数，额外添加了 *Sheen* 和 *SubsurfaceColor* 两个参数：
 
 | 参数 | 定义 |
+| --- | --- |
 | SheenColor      | 用于创建双色调镜面布料的镜面高光的颜色，默认为 0.04 以匹配标准反射率 |
 | SubsurfaceColor | 通过材质散射和吸收后的漫反射颜色的色调 |
 
