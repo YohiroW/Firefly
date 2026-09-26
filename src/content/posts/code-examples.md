@@ -8,6 +8,7 @@ category: 文章示例
 image: ./images/firefly3.avif
 slug: code-examples
 series: "Firefly 功能示例2"
+draft: true
 seriesOrder: 5
 ---
 
