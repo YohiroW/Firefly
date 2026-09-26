@@ -4,12 +4,8 @@ on:
   push:
     branches: [ master ]
   workflow_dispatch:
-
-# Pages 部署需要的权限
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+  schedule:
+    - cron: '17 2 * * *'
 
 # 确保只有一个部署任务同时运行
 concurrency:
@@ -19,6 +15,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +35,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       
+      - name: Fetch GitHub contributions
+        run: pnpm github-contributions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build site
         run: pnpm run build
 
@@ -49,6 +52,9 @@ jobs:
           path: dist  # Astro默认构建输出目录
 
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

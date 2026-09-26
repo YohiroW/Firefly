@@ -1,0 +1,131 @@
+---
+import { githubContributionsConfig, siteConfig } from "@/config";
+import snapshot from "@/constants/github-contributions.json";
+
+type ContributionDay = {
+	date: string;
+	contributionCount: number;
+	contributionLevel: string;
+};
+type ContributionWeek = { contributionDays: ContributionDay[] };
+
+const { username } = githubContributionsConfig;
+const { weeks, updatedAt, totalContributions } = snapshot as {
+	username: string;
+	updatedAt: string | null;
+	totalContributions: number;
+	weeks: ContributionWeek[];
+};
+const hasData = snapshot.username === username && weeks.length > 0;
+const locale = siteConfig.lang?.replace("_", "-") ?? "en";
+const isChinese = locale.toLowerCase().startsWith("zh");
+const dayFormatter = new Intl.DateTimeFormat(locale, {
+	year: "numeric",
+	month: "long",
+	day: "numeric",
+	timeZone: "UTC",
+});
+const monthFormatter = new Intl.DateTimeFormat(locale, {
+	month: "short",
+	timeZone: "UTC",
+});
+const dateFromDay = (date: string) => new Date(`${date}T12:00:00Z`);
+const filledWeeks = weeks.map((week, index) => {
+	const byWeekday = new Map(
+		week.contributionDays.map((day) => [
+			dateFromDay(day.date).getUTCDay(),
+			day,
+		]),
+	);
+	const monthStart = week.contributionDays.find((day) =>
+		day.date.endsWith("-01"),
+	);
+	const monthDay = index === 0 ? week.contributionDays[0] : monthStart;
+	return {
+		days: Array.from({ length: 7 }, (_, weekday) => byWeekday.get(weekday)),
+		month: monthDay ? monthFormatter.format(dateFromDay(monthDay.date)) : "",
+	};
+});
+const formattedCount = totalContributions.toLocaleString(locale);
+const profileUrl = `https://github.com/${encodeURIComponent(username)}`;
+---
+
+<section class="card-base contribution-card p-5 mb-4 onload-animation" aria-labelledby="github-contributions-title">
+	<div class="contribution-heading">
+		<h2 id="github-contributions-title" class="text-lg font-bold">
+			{isChinese ? "GitHub 贡献" : "GitHub contributions"}
+		</h2>
+		<a href={profileUrl} target="_blank" rel="noopener noreferrer" class="text-sm text-(--primary)">
+			@{username}
+		</a>
+	</div>
+	{hasData ? (
+		<>
+			<p class="contribution-summary text-sm text-neutral-600 dark:text-neutral-400">
+				{isChinese ? `过去一年共 ${formattedCount} 次贡献` : `${formattedCount} contributions in the last year`}
+			</p>
+			<div class="contribution-scroll" role="region" aria-label={isChinese ? "GitHub 贡献日历" : "GitHub contribution calendar"} tabindex="0">
+				<div class="contribution-chart">
+					<div class="weekday-labels" aria-hidden="true">
+						<span></span><span>{isChinese ? "一" : "Mon"}</span><span></span><span>{isChinese ? "三" : "Wed"}</span><span></span><span>{isChinese ? "五" : "Fri"}</span><span></span>
+					</div>
+					<div class="contribution-weeks">
+						{filledWeeks.map((week) => (
+							<div class="contribution-week">
+								<span class="month-label" aria-hidden="true">{week.month}</span>
+								{week.days.map((day) => day ? (
+									<span
+										class="contribution-day"
+										data-level={day.contributionLevel}
+										role="img"
+										aria-label={isChinese
+											? `${dayFormatter.format(dateFromDay(day.date))}：${day.contributionCount} 次贡献`
+											: `${day.contributionCount} contributions on ${dayFormatter.format(dateFromDay(day.date))}`}
+										title={isChinese
+											? `${dayFormatter.format(dateFromDay(day.date))}：${day.contributionCount} 次贡献`
+											: `${day.contributionCount} contributions on ${dayFormatter.format(dateFromDay(day.date))}`}
+									/>
+								) : <span class="contribution-empty" aria-hidden="true" />)}
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+			<div class="contribution-footer text-xs text-neutral-500 dark:text-neutral-400">
+				<span>{isChinese ? `更新于 ${updatedAt?.slice(0, 10)}` : `Updated ${updatedAt?.slice(0, 10)}`}</span>
+				<div class="contribution-legend" aria-label={isChinese ? "颜色越深，贡献越多" : "Darker squares mean more contributions"}>
+					<span>{isChinese ? "少" : "Less"}</span>
+					{["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE"].map((level) => (
+						<span class="contribution-day" data-level={level} aria-hidden="true" />
+					))}
+					<span>{isChinese ? "多" : "More"}</span>
+				</div>
+			</div>
+		</>
+	) : (
+		<p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+			{isChinese ? "贡献数据暂不可用，构建时会自动重试。" : "Contribution data is unavailable; the next build will retry."}
+		</p>
+	)}
+</section>
+
+<style>
+	.contribution-heading, .contribution-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+	.contribution-summary { margin: .25rem 0 .75rem; }
+	.contribution-scroll { overflow-x: auto; padding-bottom: .5rem; }
+	.contribution-chart { display: flex; width: max-content; gap: .5rem; }
+	.weekday-labels { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; padding-top: 20px; font-size: 10px; line-height: 11px; color: var(--text-color); }
+	.contribution-weeks { display: flex; gap: 3px; }
+	.contribution-week { display: grid; grid-template-rows: 17px repeat(7, 11px); gap: 3px; width: 11px; }
+	.month-label { white-space: nowrap; font-size: 10px; line-height: 14px; }
+	.contribution-day, .contribution-empty { display: block; width: 11px; height: 11px; border-radius: 2px; }
+	.contribution-day { background: #ebedf0; }
+	.contribution-day[data-level="FIRST_QUARTILE"] { background: #9be9a8; }
+	.contribution-day[data-level="SECOND_QUARTILE"] { background: #40c463; }
+	.contribution-day[data-level="THIRD_QUARTILE"] { background: #30a14e; }
+	.contribution-day[data-level="FOURTH_QUARTILE"] { background: #216e39; }
+	:global(html.dark) .contribution-day[data-level="NONE"], :global(html[data-theme="dark"]) .contribution-day[data-level="NONE"] { background: #2d333b; }
+	.contribution-footer { margin-top: .4rem; }
+	.contribution-legend { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+	@media (max-width: 500px) { .contribution-footer { align-items: flex-start; flex-direction: column; gap: .4rem; } }
+</style>
