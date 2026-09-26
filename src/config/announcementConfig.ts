@@ -5,7 +5,7 @@ export const announcementConfig: AnnouncementConfig = {
 	title: "",
 
 	// 公告内容
-	content: "去码头整点薯条。",
+	content: "",
 
 	// 是否允许用户关闭公告
 	closable: true,
