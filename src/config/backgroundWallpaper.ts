@@ -74,18 +74,12 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			titleSize: "4.5rem",
 			// 主页横幅副标题
 			subtitle: [
-				"For Thine is the Kingdom",
-        "Between the conception and the creation",
-        "Between the emotion and the response",
-        "Falls the shadow",
-        "Between the desire and the spasm",
-        "Between the potency and the existence",
-        "Between the essence and the descent",
-        "Falls the shadow",
-				"For Thine is",
-				"Life is",
-				"This is the way the world ends",
-				"Not with a bang but a whimper",
+				"In Reddened Chrysalis, I Once Rest",
+				"From Shattered Sky, I Free Fall",
+				"Amidst Silenced Stars, I Deep Sleep",
+				"Upon Lighted Fyrefly, I Soon Gaze",
+				"From Undreamt Night, I Thence Shine",
+				"In Finalized Morrow, I Full Bloom",
 			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
@@ -97,9 +91,9 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 				// 打字速度（毫秒）
 				speed: 100,
 				// 删除速度（毫秒）
-				deleteSpeed: 80,
+				deleteSpeed: 50,
 				// 完全显示后的暂停时间（毫秒）
-				pauseTime: 1200,
+				pauseTime: 2000,
 			},
 			// 是否显示标题下方的链接图标
 			linksEnable: true,

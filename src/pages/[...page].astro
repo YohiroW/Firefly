@@ -1,9 +1,8 @@
 ---
 import type { GetStaticPaths } from "astro";
-import GithubContributions from "@/components/common/GithubContributions.astro";
 import Pagination from "@/components/common/Pagination.astro";
 import PostPage from "@/components/layout/PostPage.astro";
-import { githubContributionsConfig, siteConfig } from "@/config";
+import { siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
@@ -29,7 +28,6 @@ const heading =
 ---
 
 <MainGridLayout heading={heading}>
-  {page.currentPage === 1 && githubContributionsConfig.enable && <GithubContributions />}
   <PostPage page={page} />
   {
     page.total > page.size && (
