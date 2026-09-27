@@ -51,8 +51,7 @@ export const siteConfig: SiteConfig = {
 	site_url: "https://yohiro.games",
 
 	// 站点描述
-	description:
-		"碎碎念的地方",
+	description: "碎碎念的地方",
 
 	// 站点关键词
 	keywords: [

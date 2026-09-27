@@ -49,9 +49,7 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 		],
 		// 移动背景图片（支持单张或多张随机）
 		// mobile: "assets/images/MobileWallpaper/m1.avif",
-		mobile: [
-  		"assets/images/DesktopWallpaper/banner2.png",
-		],
+		mobile: ["assets/images/DesktopWallpaper/banner2.png"],
 		// 背景视频播放地址
 		// 支持单个视频路径（字符串）或多个视频循环（数组，参考上面壁纸配置）
 		// 支持远程视频URL，本地视频请放在 public/assets/videos/ 目录下
@@ -74,15 +72,15 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			titleSize: "4.5rem",
 			// 主页横幅副标题
 			subtitle: [
-			  "For Thine is the Kingdom",
+				"For Thine is the Kingdom",
 				"Between the conception and the creation",
 				"Between the emotion and the response",
 				"Falls the Shadow",
 				"For Thine is the Kingdom",
 				"For Thine is the",
 				"This is the way the world ends",
-				"Not with a bang but a whimper"
-      ],
+				"Not with a bang but a whimper",
+			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
 			typewriter: {

@@ -26,7 +26,7 @@ export const booknavPageConfig: BooknavPageConfig = {
 export const booknavConfig: BooknavGroup[] = [
 	{
 		id: "dev",
-    name: "开发",
+		name: "开发",
 		icon: "material-symbols:code-rounded",
 		desc: "写代码时离不开的站点",
 		weight: 100,
@@ -44,21 +44,20 @@ export const booknavConfig: BooknavGroup[] = [
 			{
 				title: "Godot",
 				url: "https://godotengine.org/",
-        desc: "开源免费 2D/3D 游戏引擎",
+				desc: "开源免费 2D/3D 游戏引擎",
 				weight: 9,
 			},
 			{
 				title: "Blender",
 				url: "https://www.blender.org/",
-        desc: "开源 DCC 工具",
+				desc: "开源 DCC 工具",
 				weight: 9,
 			},
-
 		],
 	},
 	{
 		id: "blogs",
-    name: "技术博客",
+		name: "技术博客",
 		icon: "material-symbols:code-rounded",
 		desc: "与图形、设计、开发相关的博客",
 		weight: 100,
@@ -71,7 +70,7 @@ export const booknavConfig: BooknavGroup[] = [
 			{
 				title: "Jendrik Illner",
 				url: "https://www.jendrikillner.com/index.html",
-        desc: "Weekly Graphics",
+				desc: "Weekly Graphics",
 				weight: 9,
 			},
 			{
@@ -93,11 +92,11 @@ export const booknavConfig: BooknavGroup[] = [
 				weight: 8,
 			},
 			{
-					title: "Inigo Quilez",
-					url: "https://iquilezles.org/",
-					desc: "",
-					weight: 8,
-				},
+				title: "Inigo Quilez",
+				url: "https://iquilezles.org/",
+				desc: "",
+				weight: 8,
+			},
 		],
 	},
 	{
@@ -119,14 +118,14 @@ export const booknavConfig: BooknavGroup[] = [
 				url: "https://github.com/chrdavis/SmartRename",
 				desc: "基于 win shell 的重命名工具",
 				weight: 10,
-      },
-   		{
+			},
+			{
 				title: "input-leap",
 				url: "https://github.com/input-leap/input-leap",
 				desc: "开源 KVM 工具",
 				weight: 10,
-      },
-      {
+			},
+			{
 				title: "code-review-graph",
 				url: "https://github.com/tirth8205/code-review-graph",
 				desc: "Local-first code intelligence graph for MCP and CLI.",
@@ -141,12 +140,12 @@ export const booknavConfig: BooknavGroup[] = [
 		desc: "配色、图标与灵感来源",
 		weight: 90,
 		items: [
-  		{
-  			title: "ShaderToy",
-  			url: "https://www.shadertoy.com/",
-  			desc: "构建和分享你最喜欢的着色器",
-  			weight: 10,
-  		},
+			{
+				title: "ShaderToy",
+				url: "https://www.shadertoy.com/",
+				desc: "构建和分享你最喜欢的着色器",
+				weight: 10,
+			},
 			{
 				title: "Iconify",
 				url: "https://icon-sets.iconify.design",
@@ -168,13 +167,13 @@ export const booknavConfig: BooknavGroup[] = [
 		desc: "顺手的在线小工具",
 		weight: 80,
 		items: [
-  		{
-  			title: "Compiler Explorer",
-  			url: "https://godbolt.org/",
-  			desc: "在线编译 cpp 并对比不同编译器下的汇编代码",
-  			weight: 10,
-  		},
- 			{
+			{
+				title: "Compiler Explorer",
+				url: "https://godbolt.org/",
+				desc: "在线编译 cpp 并对比不同编译器下的汇编代码",
+				weight: 10,
+			},
+			{
 				title: "desmos",
 				url: "https://www.desmos.com/calculator?lang=zh-CN",
 				desc: "在线函数绘图工具",
@@ -213,42 +212,42 @@ export const booknavConfig: BooknavGroup[] = [
 		desc: "文档、教程与阅读",
 		weight: 70,
 		items: [
-  		{
-  			title: "Unreal Engine Community",
-  			url: "https://dev.epicgames.com/community/unreal-engine/learning",
-  			desc: "Unreal Engine 官方学习社区",
-  			weight: 8,
-  		},
-  		{
-  			title: "GPU Gems 系列",
-  			url: "https://developer.nvidia.com/gpugems/gpugems3/contributors/",
-  			desc: "实时图形学技术概览",
-  			weight: 7,
-  		},
-  		{
-  			title: "Tech-Arists.Org",
-  			url: "https://www.tech-artists.org/",
-  			desc: "TA 交流中心",
-  			weight: 7,
-  		},
-  		{
-  			title: "Real-Time VFX",
-  			url: "https://realtimevfx.com/",
-  			desc: "",
-  			weight: 7,
-  		},
-  		{
-  			title: "Direct3D 12",
-  			url: "https://learn.microsoft.com/zh-cn/windows/win32/direct3d12/direct3d-12-graphics",
-  			desc: "Direct3D 12 官方指南",
-  			weight: 6,
-  		},
-  		{
-  			title: "游戏设计模式",
-  			url: "https://gpp.tkchu.me/acknowledgements.html",
-  			desc: "游戏开发中常用的设计模式",
-  			weight: 6,
-  		},
+			{
+				title: "Unreal Engine Community",
+				url: "https://dev.epicgames.com/community/unreal-engine/learning",
+				desc: "Unreal Engine 官方学习社区",
+				weight: 8,
+			},
+			{
+				title: "GPU Gems 系列",
+				url: "https://developer.nvidia.com/gpugems/gpugems3/contributors/",
+				desc: "实时图形学技术概览",
+				weight: 7,
+			},
+			{
+				title: "Tech-Arists.Org",
+				url: "https://www.tech-artists.org/",
+				desc: "TA 交流中心",
+				weight: 7,
+			},
+			{
+				title: "Real-Time VFX",
+				url: "https://realtimevfx.com/",
+				desc: "",
+				weight: 7,
+			},
+			{
+				title: "Direct3D 12",
+				url: "https://learn.microsoft.com/zh-cn/windows/win32/direct3d12/direct3d-12-graphics",
+				desc: "Direct3D 12 官方指南",
+				weight: 6,
+			},
+			{
+				title: "游戏设计模式",
+				url: "https://gpp.tkchu.me/acknowledgements.html",
+				desc: "游戏开发中常用的设计模式",
+				weight: 6,
+			},
 			{
 				title: "C++ 参考手册",
 				url: "https://en.cppreference.com/",
