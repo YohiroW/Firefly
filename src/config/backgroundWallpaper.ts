@@ -74,13 +74,15 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			titleSize: "4.5rem",
 			// 主页横幅副标题
 			subtitle: [
-				"In Reddened Chrysalis, I Once Rest",
-				"From Shattered Sky, I Free Fall",
-				"Amidst Silenced Stars, I Deep Sleep",
-				"Upon Lighted Fyrefly, I Soon Gaze",
-				"From Undreamt Night, I Thence Shine",
-				"In Finalized Morrow, I Full Bloom",
-			],
+			  "For Thine is the Kingdom",
+				"Between the conception and the creation",
+				"Between the emotion and the response",
+				"Falls the Shadow",
+				"For Thine is the Kingdom",
+				"For Thine is the",
+				"This is the way the world ends",
+				"Not with a bang but a whimper"
+      ],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
 			typewriter: {
@@ -89,11 +91,11 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 				// 打字机关闭 → 每次刷新随机显示一条副标题
 				enable: true,
 				// 打字速度（毫秒）
-				speed: 100,
+				speed: 60,
 				// 删除速度（毫秒）
-				deleteSpeed: 50,
+				deleteSpeed: 30,
 				// 完全显示后的暂停时间（毫秒）
-				pauseTime: 2000,
+				pauseTime: 1500,
 			},
 			// 是否显示标题下方的链接图标
 			linksEnable: true,
