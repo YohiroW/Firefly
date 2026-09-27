@@ -8,6 +8,7 @@ tags: ["firefly", "markdown", "guide"]
 category: "Firefly Guides"
 series: "Firefly 功能示例"
 seriesOrder: 1
+draft: true
 ---
 
 
