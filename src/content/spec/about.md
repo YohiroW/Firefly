@@ -1,16 +1,11 @@
-# 关于我 / About Me
+# 关于我
 
-你好！我是 **Yohiro** ，一个游戏开发者。
+你好，我是 **Yohiro**，一名游戏开发者。
 
-## 🛠️ 关于本站
+我会在这里分享我在开发过程中遇到的各种问题以及我解决问题的思路。
 
-这个网站使用 **Astro** 框架构建，采用了 [Firefly](https://github.com/CuteLeaf/Firefly) 模板，Firefly 是基于 [Fuwari](https://github.com/saicaca/fuwari) 的二次开发。
+## 关于本站
 
+本站使用 Astro 构建，采用 [Firefly](https://github.com/CuteLeaf/Firefly) 主题；Firefly 基于 [Fuwari](https://github.com/saicaca/fuwari) 开发。
 
-<!--::github{repo="CuteLeaf/Firefly"}-->
-
-<!--::github{repo="saicaca/fuwari"}-->
-
----
-
-*感谢你的来访！希望在这里能找到对你有用的内容！*
+如果你想交流文章或项目，欢迎通过 [邮件](mailto:yohiro36@foxmail.com) 联系我。
