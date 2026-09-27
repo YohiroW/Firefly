@@ -40,7 +40,7 @@ K-DOP (**D**iscrete **O**riented **P**olytope)
 
 > 如果我们有一组N维向量，现在要将其降到K维（K小于N），那么我们应该如何选择K个基才能最大程度保留原有的信息？
 
-![PCA](/assets/images/OBB/PCA.png){: .w-70}
+![PCA](/assets/images/OBB/PCA.png)
 _一个高斯分布的主成分分析。黑色的两个向量是此分布的协方差矩阵的特征向量，其长度为对应的特征值之平方根，并以分布的平均值为原点。_
 
 ### 原理
@@ -51,7 +51,7 @@ PCA 中的主成分实际上指的是，使数据中的点的投影数量最多�
 
 在统计学里，**方差（Variance）**用于描述数据的离散程度，**协方差（Covariance）**用于描述数据的相关程度。方差越大，数据越离散；协方差越大，样本的相关性越强。
 
-![Covariance Trends](/assets/images/OBB/Covariance_trends.png){: .right}
+![Covariance Trends](/assets/images/OBB/Covariance_trends.png)
 
 对于一维的数据，只需要找出方差最大的方向即可，这个方向就是一维数据的主成分，但对于更高维度的数据就需要引入协方差来解决。
 

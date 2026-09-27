@@ -4,6 +4,7 @@ published: 2019-06-29
 author: "Yohiro"
 category: "Graphics & Rendering"
 tags: ["filament", "materials", "pbr"]
+series: "Filament 笔记"
 ---
 
 本篇是 [**Filament**](https://google.github.io/filament/Filament.html) 的笔记，以及部分自己的理解。
