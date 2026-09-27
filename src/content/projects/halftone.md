@@ -16,7 +16,7 @@ link:
     value: "https://github.com/YohiroW/HalfTone"
   - label: "使用"
     icon: "material-symbols:important-devices-outline-rounded"
-    value: "https://yohiro.games/halftone"
+    value: "https://yohiro.games/halftone/"
 ---
 
 # HalfTone Studio
