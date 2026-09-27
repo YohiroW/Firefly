@@ -2,8 +2,8 @@
 title: "Lumen"
 published: 2022-05-04
 author: "Yohiro"
-category: "Unreal"
-tags: ["unreal","GI","lighting","graphics"]
+category: "Graphics & Rendering"
+tags: ["lumen", "global-illumination", "unreal-engine"]
 draft: true
 ---
 

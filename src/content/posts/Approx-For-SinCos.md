@@ -2,8 +2,8 @@
 title: "三角函数的 FP64 近似"
 published: 2019-11-12
 author: "Outerra"
-category: "Math"
-tags: ["math","optimization","opengl"]
+category: "Algorithms & Math"
+tags: ["trigonometry", "fp64", "optimization", "opengl"]
 ---
 
 对 GLSL 中缺失的 FP64 函数的近似，其他的信息可以参考[**OpenGL中地图投影的双精度近似**](https://outerra.blogspot.com/2014/05/double-precision-approximations-for-map.html)

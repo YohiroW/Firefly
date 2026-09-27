@@ -2,8 +2,8 @@
 title: "Delta Color Compression"
 published: 2022-08-21
 author: "Yohiro"
-category: "Graphics"
-tags: ["graphics","optimization","amd","compression"]
+category: "Graphics & Rendering"
+tags: ["delta-color-compression", "amd", "gpu", "optimization"]
 ---
 
 ## 问题

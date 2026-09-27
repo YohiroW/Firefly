@@ -2,8 +2,8 @@
 title: "World Building Guide"
 published: 2023-06-09
 author: "Yohiro"
-category: "UnrealEngine"
-tags: ["unrealengine","world partition","streaming"]
+category: "Game & Engine Development"
+tags: ["world-partition", "level-streaming", "unreal-engine"]
 ---
 
 ## [**World Partition**](https://docs.unrealengine.com/5.1/en-US/world-partition-in-unreal-engine/)

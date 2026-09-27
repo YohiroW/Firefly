@@ -2,7 +2,8 @@
 title: "Screen-Space Directional Occlusion"
 published: 2022-09-14
 author: "Yohiro"
-tags: []
+category: "Graphics & Rendering"
+tags: ["ssdo", "ambient-occlusion", "rendering"]
 draft: true
 ---
 

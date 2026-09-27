@@ -2,8 +2,8 @@
 title: "Tiled memory 与 memory less"
 published: 2021-05-04
 author: "Yohiro"
-category: "Mobile"
-tags: ["mobile","memory","architecture","vulkan"]
+category: "Graphics & Rendering"
+tags: ["tile-based-rendering", "mobile", "vulkan"]
 ---
 
 ## 背景

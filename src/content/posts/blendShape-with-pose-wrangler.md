@@ -2,8 +2,8 @@
 title: "使用 Pose Wrangler 创建 Blendshape"
 published: 2023-10-11
 author: "Yohiro"
-category: "Animation"
-tags: ["animation","blendshape","maya","deform","UnrealEngine"]
+category: "Animation & Simulation"
+tags: ["blendshape", "pose-wrangler", "maya", "unreal-engine"]
 ---
 
 

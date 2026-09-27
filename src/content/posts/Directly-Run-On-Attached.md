@@ -2,8 +2,8 @@
 title: "VS 中一键 Attach 到指定进程"
 published: 2020-07-03
 author: "Yohiro"
-category: "Debug"
-tags: ["unrealengine","visualstudio","extension","tool"]
+category: "Game & Engine Development"
+tags: ["visual-studio", "debugging", "unreal-engine"]
 ---
 ## 背景
 

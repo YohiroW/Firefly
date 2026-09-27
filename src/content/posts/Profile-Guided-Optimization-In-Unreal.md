@@ -2,8 +2,8 @@
 title: "UE4 中的 PGO"
 published: 2020-08-17
 author: "Yohiro"
-category: "UnrealEngine"
-tags: ["unrealengine","optimization","tool"]
+category: "Game & Engine Development"
+tags: ["pgo", "optimization", "unreal-engine"]
 ---
 
 ## 简介

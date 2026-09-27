@@ -2,8 +2,8 @@
 title: "Occlusion Cull"
 published: 2023-07-05
 author: "Yohiro"
-category: "UnrealEngine"
-tags: ["graphics","engine","unrealengine","occlusion query","Rendering"]
+category: "Graphics & Rendering"
+tags: ["occlusion-culling", "rendering", "unreal-engine"]
 ---
 
 ## 概述

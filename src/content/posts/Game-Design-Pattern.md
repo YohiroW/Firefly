@@ -2,7 +2,8 @@
 title: "游戏设计模式"
 published: 2020-09-07
 author: "Yohiro"
-tags: ["programming","object-oriented","design-pattern"]
+category: "Game & Engine Development"
+tags: ["design-patterns", "object-oriented", "programming"]
 draft: true
 ---
 ## 软件的设计模式

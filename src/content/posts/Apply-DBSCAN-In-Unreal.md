@@ -2,8 +2,8 @@
 title: "DBSCAN 算法的应用"
 published: 2024-02-15
 author: "Yohiro"
-category: "Unreal"
-tags: ["algorithm","machine learning","unrealengine"]
+category: "Algorithms & Math"
+tags: ["dbscan", "clustering", "unreal-engine"]
 ---
 ## 介绍
 

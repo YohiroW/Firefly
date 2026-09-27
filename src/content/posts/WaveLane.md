@@ -2,8 +2,8 @@
 title: "WaveLane"
 published: 2020-02-18
 author: "sebbbi"
-category: "Graphics"
-tags: ["graphics","optimization","amd","wavefront"]
+category: "Graphics & Rendering"
+tags: ["wavefront", "amd", "gpu", "optimization"]
 ---
 
 In shader programming, you often run into a problem where you want to iterate an array in memory over all pixels in a compute shader

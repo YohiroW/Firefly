@@ -2,8 +2,8 @@
 title: "Transition Resource Barrier"
 published: 2019-12-26
 author: "Yohiro"
-category: "RHI"
-tags: ["RHI","dx12","vulkan","multithread","sync"]
+category: "Graphics & Rendering"
+tags: ["resource-barrier", "directx-12", "vulkan", "synchronization"]
 draft: true
 ---
 

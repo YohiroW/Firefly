@@ -2,8 +2,8 @@
 title: "Pose Space Deformation"
 published: 2023-10-16
 author: "Yohiro"
-category: "Unreal"
-tags: ["animation","deform","blendshape"]
+category: "Animation & Simulation"
+tags: ["pose-space-deformation", "blendshape", "unreal-engine"]
 draft: true
 ---
 ## 介绍

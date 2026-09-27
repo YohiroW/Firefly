@@ -2,8 +2,8 @@
 title: "Filament 光照篇"
 published: 2019-08-22
 author: "Yohiro"
-category: "3D"
-tags: ["3D","rendering","graphics","lighting"]
+category: "Graphics & Rendering"
+tags: ["filament", "lighting", "pbr"]
 ---
 
 本篇是 [**Filament**](https://google.github.io/filament/Filament.html) 的笔记，以及部分自己的理解。

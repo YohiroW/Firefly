@@ -2,7 +2,8 @@
 title: "霍尔顿序列"
 published: 2023-12-03
 author: "Yohiro"
-tags: []
+category: "Algorithms & Math"
+tags: ["halton-sequence", "sampling", "rendering"]
 draft: true
 ---
 ## 背景

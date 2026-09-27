@@ -2,8 +2,8 @@
 title: "实现一个LRU Cache"
 published: 2018-06-21
 author: "Yohiro"
-category: "Programming"
-tags: ["engine","programming","optimization","algorithm","unrealengine"]
+category: "Game & Engine Development"
+tags: ["lru-cache", "caching", "programming", "unreal-engine"]
 draft: true
 ---
 **LRU**(**Least Recently Used**，即**最近最少使用**)，在操作系统原理课程中，讨论虚拟内存换页算法一节，曾对LRU有所涉及。实际运用中，LRU也是一种通用的缓存置换策略，所以这里想展开谈谈，并提供一个简易的实现。

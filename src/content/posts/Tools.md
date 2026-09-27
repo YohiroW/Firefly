@@ -2,8 +2,8 @@
 title: "常用开源软件/工具归档"
 published: 2018-05-12
 author: "Yohiro"
-category: "Tool"
-tags: ["tool","open source"]
+category: "Tools & Resources"
+tags: ["open-source", "tools"]
 ---
 
 ## 系统

@@ -2,8 +2,8 @@
 title: "阅读 GCN 架构下的 Shader 汇编代码"
 published: 2022-10-17
 author: "Yohiro"
-category: "Graphics"
-tags: ["graphics","shader","assembly","compile"]
+category: "Graphics & Rendering"
+tags: ["shader", "gcn", "amd", "assembly"]
 ---
 
 ## 前言

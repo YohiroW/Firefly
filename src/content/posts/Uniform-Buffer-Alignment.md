@@ -2,8 +2,8 @@
 title: "Uniform Table 的偏移问题"
 published: 2020-12-01
 author: "Yohiro"
-category: "Rendering"
-tags: ["engine","programming","rendering","opengl","unrealengine"]
+category: "Graphics & Rendering"
+tags: ["uniform-buffer", "opengl", "unreal-engine"]
 ---
 ## 背景
 

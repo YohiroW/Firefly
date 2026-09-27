@@ -2,8 +2,8 @@
 title: "布料模拟相关内容的总结"
 published: 2022-03-11
 author: "Yohiro"
-category: "Physics"
-tags: ["cloth","animation","physics","simulation"]
+category: "Animation & Simulation"
+tags: ["cloth", "physics", "simulation"]
 ---
 
 ## 背景

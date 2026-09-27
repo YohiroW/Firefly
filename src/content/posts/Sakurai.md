@@ -2,8 +2,8 @@
 title: "WIP - 樱井政博的游戏开发方法"
 published: 2024-04-05
 author: "Yohiro"
-category: "Design"
-tags: ["game","design"]
+category: "Game & Engine Development"
+tags: ["game-design", "game-development", "masahiro-sakurai"]
 ---
 
 ## 介绍

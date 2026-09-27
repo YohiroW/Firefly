@@ -2,8 +2,8 @@
 title: "DBSCAN 聚类算法"
 published: 2024-02-01
 author: "Yohiro"
-category: "Algorithm"
-tags: ["algorithm","machine learning","clustering"]
+category: "Algorithms & Math"
+tags: ["dbscan", "clustering", "machine-learning"]
 ---
 ## 介绍
 

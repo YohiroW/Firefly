@@ -2,8 +2,8 @@
 title: "使用 PCA 方法创建有向包围盒（OBB）"
 published: 2022-11-23
 author: "Yohiro"
-category: "Algorithm"
-tags: ["geomertry","engine","algorithm","math"]
+category: "Algorithms & Math"
+tags: ["pca", "obb", "geometry"]
 ---
 
 ## 背景

@@ -2,8 +2,8 @@
 title: "颜色管线与色彩空间"
 published: 2021-10-14
 author: "Yohiro"
-category: "Rendering"
-tags: ["engine","unrealengine","colorspace","HDR"]
+category: "Graphics & Rendering"
+tags: ["color-space", "hdr", "unreal-engine"]
 draft: true
 ---
 

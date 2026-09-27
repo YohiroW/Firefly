@@ -2,7 +2,8 @@
 title: "Nanite"
 published: 2023-03-16
 author: "Yohiro"
-tags: []
+category: "Graphics & Rendering"
+tags: ["nanite", "virtual-geometry", "unreal-engine"]
 ---
 
 ## 概述

@@ -2,8 +2,8 @@
 title: "Dont Store That In A Float"
 published: 2019-03-16
 author: "Brucedawson"
-category: "Programming"
-tags: ["engine","game","programming","misc"]
+category: "Game & Engine Development"
+tags: ["floating-point", "precision", "programming"]
 ---
 
 之前做Time of Day系统的时候遇到过一个精度问题，然后看到了这样的一篇文章感觉挺有意思，所以拿来记录一下。

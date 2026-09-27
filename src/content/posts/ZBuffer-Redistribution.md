@@ -2,8 +2,8 @@
 title: "关于 Depth Buffer 的分布方式"
 published: 2019-05-15
 author: "Yohiro"
-category: "Engine"
-tags: ["engine","rendering","optimization","math","depth"]
+category: "Graphics & Rendering"
+tags: ["depth-buffer", "z-buffer", "precision"]
 ---
 
 ## 背景

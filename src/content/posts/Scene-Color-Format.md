@@ -2,8 +2,8 @@
 title: "移动端 SceneColor 格式问题"
 published: 2021-09-28
 author: "Yohiro"
-category: "Unreal"
-tags: ["graphics","rendering","profile","unrealengine"]
+category: "Graphics & Rendering"
+tags: ["scene-color", "mobile", "unreal-engine"]
 ---
 ## 背景
 

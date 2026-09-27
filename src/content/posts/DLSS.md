@@ -2,8 +2,8 @@
 title: "DLSS 的使用和注意事项"
 published: 2023-12-21
 author: "Yohiro"
-category: "Unreal"
-tags: ["unreal","dlss","graphics"]
+category: "Graphics & Rendering"
+tags: ["dlss", "upscaling", "unreal-engine"]
 ---
 ## Overview
 
